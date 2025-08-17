@@ -15,7 +15,50 @@ interface AddHabitDialogProps {
   onAddHabit: (name: string, emoji?: string) => void;
 }
 
-const commonEmojis = ["💪", "🧘", "📚", "💧", "🥗", "🏃", "🌅", "💊", "🛏️", "🚿"];
+const commonEmojis = [
+  "💪", "🧘", "📚", "💧", "🥗", "🏃", "🌅", "💊", "🛏️", "🚿",
+  "🎯", "⚡", "🔥", "🎨", "🎵", "🌱", "☀️", "🧠", "❤️", "✨",
+  "🏋️", "🚴", "🏊", "🎸", "📝", "🍎", "🥛", "🌿", "🔔", "📱"
+];
+
+// Auto-assign icons based on habit keywords
+const getAutoIcon = (habitName: string): string => {
+  const name = habitName.toLowerCase();
+  
+  if (name.includes('water') || name.includes('drink') || name.includes('hydrat')) return '💧';
+  if (name.includes('exercise') || name.includes('workout') || name.includes('gym')) return '💪';
+  if (name.includes('read') || name.includes('book') || name.includes('study')) return '📚';
+  if (name.includes('meditat') || name.includes('mindful') || name.includes('breath')) return '🧘';
+  if (name.includes('run') || name.includes('jog') || name.includes('cardio')) return '🏃';
+  if (name.includes('sleep') || name.includes('rest') || name.includes('bed')) return '🛏️';
+  if (name.includes('shower') || name.includes('bath') || name.includes('clean')) return '🚿';
+  if (name.includes('eat') || name.includes('meal') || name.includes('nutrition')) return '🥗';
+  if (name.includes('vitamin') || name.includes('pill') || name.includes('medicine')) return '💊';
+  if (name.includes('wake') || name.includes('morning') || name.includes('early')) return '🌅';
+  if (name.includes('write') || name.includes('journal') || name.includes('diary')) return '📝';
+  if (name.includes('music') || name.includes('song') || name.includes('listen')) return '🎵';
+  if (name.includes('art') || name.includes('draw') || name.includes('paint')) return '🎨';
+  if (name.includes('bike') || name.includes('cycle') || name.includes('cycling')) return '🚴';
+  if (name.includes('swim') || name.includes('pool')) return '🏊';
+  if (name.includes('guitar') || name.includes('instrument') || name.includes('practice')) return '🎸';
+  if (name.includes('fruit') || name.includes('apple') || name.includes('healthy')) return '🍎';
+  if (name.includes('milk') || name.includes('protein') || name.includes('shake')) return '🥛';
+  if (name.includes('plant') || name.includes('garden') || name.includes('green')) return '🌱';
+  if (name.includes('goal') || name.includes('target') || name.includes('focus')) return '🎯';
+  if (name.includes('energy') || name.includes('power') || name.includes('boost')) return '⚡';
+  if (name.includes('passion') || name.includes('fire') || name.includes('burn')) return '🔥';
+  if (name.includes('brain') || name.includes('think') || name.includes('mental')) return '🧠';
+  if (name.includes('love') || name.includes('heart') || name.includes('care')) return '❤️';
+  if (name.includes('shine') || name.includes('glow') || name.includes('sparkle')) return '✨';
+  if (name.includes('lift') || name.includes('weight') || name.includes('strength')) return '🏋️';
+  if (name.includes('sun') || name.includes('bright') || name.includes('light')) return '☀️';
+  if (name.includes('remind') || name.includes('alert') || name.includes('notification')) return '🔔';
+  if (name.includes('phone') || name.includes('app') || name.includes('digital')) return '📱';
+  if (name.includes('nature') || name.includes('leaf') || name.includes('organic')) return '🌿';
+  
+  // Default fallback icons
+  return '✨';
+};
 
 const AddHabitDialog = ({ open, onOpenChange, onAddHabit }: AddHabitDialogProps) => {
   const [habitName, setHabitName] = useState("");
@@ -23,7 +66,8 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit }: AddHabitDialogProps)
 
   const handleSave = () => {
     if (habitName.trim()) {
-      onAddHabit(habitName.trim(), selectedEmoji);
+      const finalEmoji = selectedEmoji || getAutoIcon(habitName.trim());
+      onAddHabit(habitName.trim(), finalEmoji);
       setHabitName("");
       setSelectedEmoji("");
       onOpenChange(false);
@@ -65,7 +109,7 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit }: AddHabitDialogProps)
             <Label className="text-sm font-medium text-foreground">
               Choose an Icon (Optional)
             </Label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-6 gap-2">
               {commonEmojis.map((emoji) => (
                 <button
                   key={emoji}
