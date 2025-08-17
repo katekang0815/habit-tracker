@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -51,6 +52,21 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				habit: {
+					complete: 'hsl(var(--habit-complete))',
+					incomplete: 'hsl(var(--habit-incomplete))'
+				},
+				streak: {
+					flame: 'hsl(var(--streak-flame))'
+				},
+				calendar: {
+					active: 'hsl(var(--calendar-active))',
+					today: 'hsl(var(--calendar-today))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
