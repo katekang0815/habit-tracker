@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Habit } from "@/pages/Index";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface HabitListProps {
   habits: Habit[];
@@ -61,13 +61,21 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
                 )}
               </button>
               
-              {/* Sparkles animation */}
+              {/* Radiating lines animation */}
               {animatingHabits.has(habit.id) && (
-                <>
-                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
-                  <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
-                  <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
-                </>
+                <div className="absolute inset-0 pointer-events-none">
+                  {/* Create 8 radiating lines */}
+                  {[0, 45, 90, 135, 180, 225, 270, 315].map((rotation) => (
+                    <div
+                      key={rotation}
+                      className="absolute top-1/2 left-1/2 w-px h-4 bg-habit-complete animate-burst-line origin-bottom"
+                      style={{
+                        transform: `translate(-50%, -100%) rotate(${rotation}deg)`,
+                        animationDelay: `${rotation / 8 * 100}ms`
+                      }}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </div>
