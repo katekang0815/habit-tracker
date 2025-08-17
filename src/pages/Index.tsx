@@ -77,7 +77,7 @@ const Index = () => {
               <Button variant="outline" className="bg-primary/20">
                 Login
               </Button>
-              <Button variant="outline"className="border-3 border-primary/20">
+              <Button variant="outline"className="border-2 border-primary/20">
                 Sign Up
               </Button>
             </div>
