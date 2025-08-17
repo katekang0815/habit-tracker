@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Habit } from "@/pages/Index";
-import { Check, Sparkles } from "lucide-react";
+import { Check, StarHalf } from "lucide-react";
 
 interface HabitListProps {
   habits: Habit[];
