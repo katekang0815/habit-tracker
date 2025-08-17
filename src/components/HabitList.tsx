@@ -33,11 +33,7 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
               className="w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center"
             >
               {habit.completed && (
-                habit.emoji ? (
-                  <span className="text-lg">{habit.emoji}</span>
-                ) : (
-                  <Check className="w-4 h-4 text-habit-complete" />
-                )
+                <Check className="w-4 h-4 text-habit-complete" />
               )}
             </button>
           </div>
