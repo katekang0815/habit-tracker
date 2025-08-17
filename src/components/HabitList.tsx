@@ -1,17 +1,28 @@
 import { useState } from "react";
 import { Habit } from "@/pages/Index";
-import { Check, StarHalf, Sparkles } from "lucide-react";
+import { Check, StarHalf, Sparkles, MoreVertical, Trash2, Pause, Play } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HabitListProps {
   habits: Habit[];
   onToggleHabit: (id: string) => void;
+  onDeleteHabit: (id: string) => void;
+  onPauseHabit: (id: string) => void;
 }
 
-const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
+const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: HabitListProps) => {
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
 
   const handleToggleHabit = (id: string) => {
     const habit = habits.find(h => h.id === id);
+    
+    // Don't allow toggling if habit is paused
+    if (habit?.paused) return;
     
     // If habit is being marked as complete, trigger animation
     if (habit && !habit.completed) {
@@ -35,7 +46,9 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
       {habits.map((habit, index) => (
         <div
           key={habit.id}
-          className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300"
+          className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
+            habit.paused ? 'opacity-50 grayscale' : ''
+          }`}
         >
           <div className="flex items-center gap-4">
             <span className="text-lg font-medium text-muted-foreground">
@@ -51,24 +64,62 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
               </span>
             </div>
             
-            <div className="relative">
-              <button
-                onClick={() => handleToggleHabit(habit.id)}
-                className="w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative"
-              >
-                {habit.completed && (
-                  <Check className={`w-4 h-4 text-habit-complete ${animatingHabits.has(habit.id) ? 'animate-spark' : ''}`} />
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <button
+                  onClick={() => handleToggleHabit(habit.id)}
+                  disabled={habit.paused}
+                  className={`w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative ${
+                    habit.paused ? 'cursor-not-allowed opacity-50' : ''
+                  }`}
+                >
+                  {habit.completed && (
+                    <Check className={`w-4 h-4 text-habit-complete ${animatingHabits.has(habit.id) ? 'animate-spark' : ''}`} />
+                  )}
+                </button>
+                
+                {/* Sparkles animation */}
+                {animatingHabits.has(habit.id) && (
+                  <>
+                    <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
+                    <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
+                    <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
+                  </>
                 )}
-              </button>
-              
-              {/* Sparkles animation */}
-              {animatingHabits.has(habit.id) && (
-                <>
-                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
-                  <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
-                  <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
-                </>
-              )}
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="w-8 h-8 rounded-full hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center">
+                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem
+                    onClick={() => onPauseHabit(habit.id)}
+                    className="flex items-center gap-2"
+                  >
+                    {habit.paused ? (
+                      <>
+                        <Play className="w-4 h-4" />
+                        Resume
+                      </>
+                    ) : (
+                      <>
+                        <Pause className="w-4 h-4" />
+                        Pause
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onDeleteHabit(habit.id)}
+                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

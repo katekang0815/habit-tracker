@@ -10,6 +10,7 @@ export interface Habit {
   name: string;
   completed: boolean;
   emoji?: string;
+  paused?: boolean;
 }
 
 const Index = () => {
@@ -29,6 +30,16 @@ const Index = () => {
   const toggleHabit = (id: string) => {
     setHabits(habits.map(habit => 
       habit.id === id ? { ...habit, completed: !habit.completed } : habit
+    ));
+  };
+
+  const deleteHabit = (id: string) => {
+    setHabits(habits.filter(habit => habit.id !== id));
+  };
+
+  const pauseHabit = (id: string) => {
+    setHabits(habits.map(habit => 
+      habit.id === id ? { ...habit, paused: !habit.paused, completed: false } : habit
     ));
   };
 
@@ -66,6 +77,8 @@ const Index = () => {
           <HabitList 
             habits={habits} 
             onToggleHabit={toggleHabit}
+            onDeleteHabit={deleteHabit}
+            onPauseHabit={pauseHabit}
           />
         )}
       </div>
