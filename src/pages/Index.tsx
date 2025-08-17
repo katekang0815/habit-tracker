@@ -77,7 +77,7 @@ const Index = () => {
               <Button variant="outline">
                 Login
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-50">
                 Sign Up
               </Button>
             </div>
