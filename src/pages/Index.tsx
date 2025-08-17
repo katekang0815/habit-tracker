@@ -91,6 +91,7 @@ const Index = () => {
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onAddHabit={addHabit}
+        existingHabits={habits}
       />
     </div>
   );
