@@ -74,10 +74,10 @@ const Index = () => {
               Create your first habit and begin your journey to a better you. Tap the + button to get started!
             </p>
             <div className="flex gap-3">
-              <Button variant="outline" className="bg-background border-background">
+              <Button variant="outline" className="bg-primary/10 border-primary/10">
                 Login
               </Button>
-              <Button variant="outline"className="border-background">
+              <Button variant="outline"className="border-primary/10">
                 Sign Up
               </Button>
             </div>
