@@ -115,14 +115,18 @@ export default {
 						opacity: '1'
 					}
 				},
-				'sparkle': {
-					'0%, 100%': {
-						transform: 'scale(0) rotate(0deg)',
-						opacity: '0'
+				'burst-line': {
+					'0%': {
+						transform: 'scale(0)',
+						opacity: '1'
 					},
 					'50%': {
-						transform: 'scale(1) rotate(180deg)',
-						opacity: '1'
+						transform: 'scale(1)',
+						opacity: '0.8'
+					},
+					'100%': {
+						transform: 'scale(1.5)',
+						opacity: '0'
 					}
 				}
 			},
@@ -130,7 +134,7 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'spark': 'spark 0.6s ease-out',
-				'sparkle': 'sparkle 0.8s ease-in-out'
+				'burst-line': 'burst-line 0.6s ease-out'
 			}
 		}
 	},

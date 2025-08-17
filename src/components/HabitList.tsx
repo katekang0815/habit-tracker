@@ -61,12 +61,28 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
                 )}
               </button>
               
-              {/* Sparkles animation */}
+              {/* Burst lines animation */}
               {animatingHabits.has(habit.id) && (
                 <>
-                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
-                  <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
-                  <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
+                  {/* Radiating lines */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Top */}
+                    <div className="absolute top-0 left-1/2 w-0.5 h-6 bg-habit-complete transform -translate-x-1/2 -translate-y-4 animate-burst-line" style={{ animationDelay: '0ms' }} />
+                    {/* Top-right */}
+                    <div className="absolute top-0 right-0 w-4 h-0.5 bg-habit-complete transform rotate-45 origin-left translate-x-2 -translate-y-2 animate-burst-line" style={{ animationDelay: '100ms' }} />
+                    {/* Right */}
+                    <div className="absolute top-1/2 right-0 w-6 h-0.5 bg-habit-complete transform -translate-y-1/2 translate-x-4 animate-burst-line" style={{ animationDelay: '200ms' }} />
+                    {/* Bottom-right */}
+                    <div className="absolute bottom-0 right-0 w-4 h-0.5 bg-habit-complete transform -rotate-45 origin-left translate-x-2 translate-y-2 animate-burst-line" style={{ animationDelay: '300ms' }} />
+                    {/* Bottom */}
+                    <div className="absolute bottom-0 left-1/2 w-0.5 h-6 bg-habit-complete transform -translate-x-1/2 translate-y-4 animate-burst-line" style={{ animationDelay: '400ms' }} />
+                    {/* Bottom-left */}
+                    <div className="absolute bottom-0 left-0 w-4 h-0.5 bg-habit-complete transform rotate-45 origin-right -translate-x-2 translate-y-2 animate-burst-line" style={{ animationDelay: '500ms' }} />
+                    {/* Left */}
+                    <div className="absolute top-1/2 left-0 w-6 h-0.5 bg-habit-complete transform -translate-y-1/2 -translate-x-4 animate-burst-line" style={{ animationDelay: '600ms' }} />
+                    {/* Top-left */}
+                    <div className="absolute top-0 left-0 w-4 h-0.5 bg-habit-complete transform -rotate-45 origin-right -translate-x-2 -translate-y-2 animate-burst-line" style={{ animationDelay: '700ms' }} />
+                  </div>
                 </>
               )}
             </div>
