@@ -1,5 +1,4 @@
 import { Habit } from "@/pages/Index";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface HabitListProps {
   habits: Habit[];
@@ -23,20 +22,19 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
               {habit.emoji && (
                 <span className="text-xl">{habit.emoji}</span>
               )}
-              <span className={`font-medium transition-all duration-300 ${
-                habit.completed 
-                  ? "text-habit-complete line-through" 
-                  : "text-foreground"
-              }`}>
+              <span className="font-medium transition-all duration-300 text-foreground">
                 {habit.name}
               </span>
             </div>
             
-            <Checkbox
-              checked={habit.completed}
-              onCheckedChange={() => onToggleHabit(habit.id)}
-              className="data-[state=checked]:bg-habit-complete data-[state=checked]:border-habit-complete"
-            />
+            <button
+              onClick={() => onToggleHabit(habit.id)}
+              className="w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center"
+            >
+              {habit.completed && habit.emoji && (
+                <span className="text-lg">{habit.emoji}</span>
+              )}
+            </button>
           </div>
         </div>
       ))}
