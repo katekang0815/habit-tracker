@@ -19,12 +19,6 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
               {index + 1}
             </span>
             
-            <Checkbox
-              checked={habit.completed}
-              onCheckedChange={() => onToggleHabit(habit.id)}
-              className="data-[state=checked]:bg-habit-complete data-[state=checked]:border-habit-complete"
-            />
-            
             <div className="flex items-center gap-3 flex-1">
               {habit.emoji && (
                 <span className="text-xl">{habit.emoji}</span>
@@ -38,11 +32,11 @@ const HabitList = ({ habits, onToggleHabit }: HabitListProps) => {
               </span>
             </div>
             
-            {habit.completed && (
-              <div className="text-habit-complete">
-                <span className="text-xl">✓</span>
-              </div>
-            )}
+            <Checkbox
+              checked={habit.completed}
+              onCheckedChange={() => onToggleHabit(habit.id)}
+              className="data-[state=checked]:bg-habit-complete data-[state=checked]:border-habit-complete"
+            />
           </div>
         </div>
       ))}
