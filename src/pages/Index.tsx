@@ -3,6 +3,7 @@ import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { Button } from "@/components/ui/button";
 import { Flame } from "lucide-react";
 
 export interface Habit {
@@ -72,6 +73,14 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 max-w-sm">
               Create your first habit and begin your journey to a better you. Tap the + button to get started!
             </p>
+            <div className="flex gap-3">
+              <Button variant="default">
+                Login
+              </Button>
+              <Button variant="outline">
+                Sign Up
+              </Button>
+            </div>
           </div>
         ) : (
           <HabitList 
