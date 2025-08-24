@@ -6,6 +6,8 @@ import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
 import { Flame } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Habit {
   id: string;
@@ -19,6 +21,32 @@ const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { toast } = useToast();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      
+      if (error) {
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Sign-in Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
+  };
 
   const addHabit = (name: string, emoji?: string) => {
     const newHabit: Habit = {
@@ -76,11 +104,12 @@ const Index = () => {
               Create your first habit and begin your journey to a better you. Tap the + button to get started!
             </p>
             <div className="flex gap-3">
-              <Button variant="outline" className="bg-primary/20">
-                Login
-              </Button>
-              <Button variant="outline"className="border-2 border-primary/20">
-                Sign Up
+              <Button 
+                variant="outline" 
+                className="bg-primary/20"
+                onClick={handleGoogleSignIn}
+              >
+                Sign in with Google
               </Button>
             </div>
           </div>
