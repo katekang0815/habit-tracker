@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Habit } from "@/pages/Index";
 import { Check, StarHalf, Sparkles, MoreVertical, Trash2, Pause, Play } from "lucide-react";
 import {
   DropdownMenu,
@@ -7,6 +6,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+interface Habit {
+  id: string;
+  name: string;
+  emoji?: string;
+  is_active: boolean;
+  completed?: boolean;
+  can_toggle?: boolean;
+}
 
 interface HabitListProps {
   habits: Habit[];
@@ -21,8 +29,8 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: Habit
   const handleToggleHabit = (id: string) => {
     const habit = habits.find(h => h.id === id);
     
-    // Don't allow toggling if habit is paused
-    if (habit?.paused) return;
+    // Don't allow toggling if habit can't be toggled (not today or future date)
+    if (!habit?.can_toggle) return;
     
     // If habit is being marked as complete, trigger animation
     if (habit && !habit.completed) {
@@ -47,7 +55,7 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: Habit
         <div
           key={habit.id}
           className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
-            habit.paused ? 'opacity-50 grayscale' : ''
+            !habit.can_toggle ? 'opacity-50' : ''
           }`}
         >
           <div className="flex items-center gap-4">
@@ -68,9 +76,9 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: Habit
               <div className="relative">
                 <button
                   onClick={() => handleToggleHabit(habit.id)}
-                  disabled={habit.paused}
+                  disabled={!habit.can_toggle}
                   className={`w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative ${
-                    habit.paused ? 'cursor-not-allowed opacity-50' : ''
+                    !habit.can_toggle ? 'cursor-not-allowed opacity-50' : ''
                   }`}
                 >
                   {habit.completed && (
@@ -99,17 +107,8 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: Habit
                     onClick={() => onPauseHabit(habit.id)}
                     className="flex items-center gap-2"
                   >
-                    {habit.paused ? (
-                      <>
-                        <Play className="w-4 h-4" />
-                        Resume
-                      </>
-                    ) : (
-                      <>
-                        <Pause className="w-4 h-4" />
-                        Pause
-                      </>
-                    )}
+                    <Pause className="w-4 h-4" />
+                    Pause
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onDeleteHabit(habit.id)}

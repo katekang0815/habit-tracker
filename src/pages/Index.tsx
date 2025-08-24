@@ -8,22 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useHabits } from "@/hooks/useHabits";
 import type { User } from "@supabase/supabase-js";
 
-export interface Habit {
-  id: string;
-  name: string;
-  completed: boolean;
-  emoji?: string;
-  paused?: boolean;
-}
-
 const Index = () => {
-  const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+  
+  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
 
   useEffect(() => {
     // Set up auth state listener
@@ -83,32 +77,6 @@ const Index = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const addHabit = (name: string, emoji?: string) => {
-    const newHabit: Habit = {
-      id: Date.now().toString(),
-      name,
-      completed: false,
-      emoji
-    };
-    setHabits([...habits, newHabit]);
-  };
-
-  const toggleHabit = (id: string) => {
-    setHabits(habits.map(habit => 
-      habit.id === id ? { ...habit, completed: !habit.completed } : habit
-    ));
-  };
-
-  const deleteHabit = (id: string) => {
-    setHabits(habits.filter(habit => habit.id !== id));
-  };
-
-  const pauseHabit = (id: string) => {
-    setHabits(habits.map(habit => 
-      habit.id === id ? { ...habit, paused: !habit.paused, completed: false } : habit
-    ));
   };
 
   const completedToday = habits.filter(habit => habit.completed).length;

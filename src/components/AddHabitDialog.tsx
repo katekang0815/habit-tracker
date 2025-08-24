@@ -9,11 +9,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+interface Habit {
+  id: string;
+  name: string;
+  emoji?: string;
+  is_active: boolean;
+  completed?: boolean;
+  can_toggle?: boolean;
+}
+
 interface AddHabitDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddHabit: (name: string, emoji?: string) => void;
-  existingHabits: { id: string; name: string; completed: boolean; emoji?: string; paused?: boolean; }[];
+  existingHabits: Habit[];
 }
 
 const commonEmojis = [
