@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { format } from "date-fns";
 import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
@@ -17,6 +18,7 @@ export interface Habit {
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const addHabit = (name: string, emoji?: string) => {
     const newHabit: Habit = {
@@ -52,14 +54,14 @@ const Index = () => {
       {/* Header */}
       <div className="px-4 pt-8 pb-4">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Aug 2025</h1>
+          <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
           <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
             <Flame className="w-4 h-4 text-streak-flame" />
             <span className="text-sm font-semibold text-foreground">{streakCount}</span>
           </div>
         </div>
         
-        <WeekView />
+        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
       </div>
 
       {/* Main Content */}

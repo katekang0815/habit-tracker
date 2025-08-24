@@ -1,35 +1,78 @@
-const WeekView = () => {
-  const days = [
-    { name: "Sun", date: 10, isToday: false },
-    { name: "Mon", date: 11, isToday: false },
-    { name: "Tue", date: 12, isToday: false },
-    { name: "Wed", date: 13, isToday: false },
-    { name: "Thu", date: 14, isToday: false },
-    { name: "Fri", date: 15, isToday: false },
-    { name: "Sat", date: 16, isToday: true },
-  ];
+import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface WeekViewProps {
+  currentDate: Date;
+  onDateChange: (date: Date) => void;
+}
+
+const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
+  const today = new Date();
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
+  
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(weekStart, i);
+    return {
+      name: format(date, "EEE"),
+      date: parseInt(format(date, "d")),
+      fullDate: date,
+      isToday: isSameDay(date, today),
+    };
+  });
+
+  const goToPreviousWeek = () => {
+    const previousWeek = subWeeks(currentDate, 1);
+    onDateChange(previousWeek);
+  };
+
+  const goToNextWeek = () => {
+    const nextWeek = addWeeks(currentDate, 1);
+    onDateChange(nextWeek);
+  };
 
   return (
-    <div className="flex justify-between items-center gap-2">
-      {days.map((day) => (
-        <div key={day.name} className="flex flex-col items-center">
-          <span className="text-xs text-muted-foreground mb-2 font-medium">
-            {day.name}
-          </span>
-          <div
-            className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 ${
-              day.isToday
-                ? "bg-calendar-today text-white shadow-lg scale-105"
-                : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
-            }`}
-          >
-            {day.date}
-          </div>
-          <div className={`w-1 h-1 rounded-full mt-2 ${
-            day.isToday ? "bg-calendar-today" : "bg-primary"
-          }`} />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={goToPreviousWeek}
+          className="h-8 w-8 p-0"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex justify-between items-center gap-2 flex-1 mx-4">
+          {days.map((day) => (
+            <div key={day.fullDate.toISOString()} className="flex flex-col items-center">
+              <span className="text-xs text-muted-foreground mb-2 font-medium">
+                {day.name}
+              </span>
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
+                  day.isToday
+                    ? "bg-calendar-today text-white shadow-lg scale-105"
+                    : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
+                }`}
+                onClick={() => onDateChange(day.fullDate)}
+              >
+                {day.date}
+              </div>
+              <div className={`w-1 h-1 rounded-full mt-2 ${
+                day.isToday ? "bg-calendar-today" : "bg-primary"
+              }`} />
+            </div>
+          ))}
         </div>
-      ))}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={goToNextWeek}
+          className="h-8 w-8 p-0"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
