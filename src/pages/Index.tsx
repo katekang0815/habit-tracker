@@ -116,8 +116,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-      {/* Header */}
-      <div className="px-4 pt-8 pb-4">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="px-4 pt-8 pb-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
           <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
@@ -160,22 +161,23 @@ const Index = () => {
             onPauseHabit={pauseHabit}
           />
         )}
+        </div>
+
+        {/* Bottom Navigation */}
+        <BottomNavigation 
+          onAddClick={() => setIsAddDialogOpen(true)} 
+          user={user}
+          onSignOut={handleSignOut}
+        />
+
+        {/* Add Habit Dialog */}
+        <AddHabitDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onAddHabit={addHabit}
+          existingHabits={habits}
+        />
       </div>
-
-      {/* Bottom Navigation */}
-      <BottomNavigation 
-        onAddClick={() => setIsAddDialogOpen(true)} 
-        user={user}
-        onSignOut={handleSignOut}
-      />
-
-      {/* Add Habit Dialog */}
-      <AddHabitDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onAddHabit={addHabit}
-        existingHabits={habits}
-      />
     </div>
   );
 };
