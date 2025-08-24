@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import type { User } from "@supabase/supabase-js";
 
 export interface Habit {
   id: string;
@@ -21,7 +22,24 @@ const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -42,6 +60,25 @@ const Index = () => {
     } catch (err) {
       toast({
         title: "Sign-in Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Sign-out Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Sign-out Failed",
         description: "An unexpected error occurred",
         variant: "destructive"
       });
@@ -103,15 +140,17 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 max-w-sm">
               Create your first habit and begin your journey to a better you. Tap the + button to get started!
             </p>
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                className="bg-primary/20"
-                onClick={handleGoogleSignIn}
-              >
-                Sign in with Google
-              </Button>
-            </div>
+            {!user && (
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  className="bg-primary/20"
+                  onClick={handleGoogleSignIn}
+                >
+                  Sign in with Google
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <HabitList 
@@ -124,7 +163,11 @@ const Index = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNavigation onAddClick={() => setIsAddDialogOpen(true)} />
+      <BottomNavigation 
+        onAddClick={() => setIsAddDialogOpen(true)} 
+        user={user}
+        onSignOut={handleSignOut}
+      />
 
       {/* Add Habit Dialog */}
       <AddHabitDialog

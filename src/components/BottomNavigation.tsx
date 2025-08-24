@@ -1,11 +1,16 @@
-import { Home, Plus, BarChart3, Users, Pause, User } from "lucide-react";
+import { Home, Plus, BarChart3, Users, Pause, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface BottomNavigationProps {
   onAddClick: () => void;
+  user: SupabaseUser | null;
+  onSignOut: () => void;
 }
 
-const BottomNavigation = ({ onAddClick }: BottomNavigationProps) => {
+const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps) => {
+  const [showSignOut, setShowSignOut] = useState(false);
   const navItems = [
     { icon: Home, label: "Home", active: true },
     { icon: Plus, label: "Add", isAdd: true },
@@ -34,6 +39,42 @@ const BottomNavigation = ({ onAddClick }: BottomNavigationProps) => {
             );
           }
           
+          if (item.label === "Profile" && user) {
+            return (
+              <div
+                key={item.label}
+                className="relative"
+                onMouseEnter={() => setShowSignOut(true)}
+                onMouseLeave={() => setShowSignOut(false)}
+              >
+                <button
+                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    item.active
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </button>
+                
+                {showSignOut && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-max">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onSignOut}
+                      className="flex items-center gap-2 text-sm hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign out
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <button
               key={item.label}
