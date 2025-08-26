@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import type { User } from "@supabase/supabase-js";
 
 export interface Habit {
@@ -23,6 +24,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { isDateInVacation } = useVacationSchedules();
 
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0];
@@ -81,7 +83,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const habitsWithStatus = habitsData.map(habit => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: isToday(selectedDate) && !isFutureDate(selectedDate)
+        can_toggle: isToday(selectedDate) && !isFutureDate(selectedDate) && !isDateInVacation(selectedDate)
       }));
 
       setHabits(habitsWithStatus);
@@ -130,7 +132,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   };
 
   const toggleHabit = async (habitId: string) => {
-    if (!user || !isToday(selectedDate)) return;
+    if (!user || !isToday(selectedDate) || isDateInVacation(selectedDate)) return;
 
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
