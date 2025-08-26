@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { VacationSuccessDialog } from "@/components/VacationSuccessDialog";
+
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +25,7 @@ const Vacation = () => {
   const [endDate, setEndDate] = useState<Date>();
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  
   const [scheduledVacation, setScheduledVacation] = useState<{start: Date, end: Date} | null>(null);
 
   const handleSignOut = async () => {
@@ -62,7 +62,6 @@ const Vacation = () => {
       });
 
       setScheduledVacation({ start: startDate, end: endDate });
-      setShowSuccessDialog(true);
       
       // Reset dates
       setStartDate(undefined);
@@ -78,7 +77,6 @@ const Vacation = () => {
 
   const handleCancelVacation = () => {
     setScheduledVacation(null);
-    setShowSuccessDialog(false);
   };
 
   return (
@@ -141,87 +139,172 @@ const Vacation = () => {
 
         <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8">
           <CardContent className="p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Set Vacation Duration</h2>
-            <p className="text-muted-foreground mb-6 text-sm">
-              Your routines will be paused and grayed out during your vacation
-            </p>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-center gap-4">
-                {/* From Date */}
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-muted-foreground mb-2">From</span>
-                  <Popover open={showStartCalendar} onOpenChange={setShowStartCalendar}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-32 h-12 text-sm font-medium border-b-2 border-primary bg-transparent rounded-none",
-                          !startDate && "text-muted-foreground"
-                        )}
-                      >
-                        {startDate ? format(startDate, "MMM d, yyyy") : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={startDate}
-                        onSelect={(date) => {
-                          setStartDate(date);
-                          setShowStartCalendar(false);
-                        }}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
+            {scheduledVacation ? (
+              <>
+                <div className="text-center mb-6">
+                  <h2 className="text-xl font-semibold text-foreground mb-2">Your vacation is scheduled 🌿</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Tap the date below to edit the period.
+                  </p>
                 </div>
 
-                <span className="text-muted-foreground font-medium">to</span>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center gap-4">
+                    {/* From Date */}
+                    <div className="flex flex-col items-center">
+                      <Popover open={showStartCalendar} onOpenChange={setShowStartCalendar}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
+                          >
+                            {format(scheduledVacation.start, "MMMM d, yyyy")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={scheduledVacation.start}
+                            onSelect={(date) => {
+                              if (date) {
+                                setScheduledVacation({ ...scheduledVacation, start: date });
+                                setShowStartCalendar(false);
+                              }
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
 
-                {/* To Date */}
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-muted-foreground mb-2">To</span>
-                  <Popover open={showEndCalendar} onOpenChange={setShowEndCalendar}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-32 h-12 text-sm font-medium border-b-2 border-primary bg-transparent rounded-none",
-                          !endDate && "text-muted-foreground"
-                        )}
-                      >
-                        {endDate ? format(endDate, "MMM d, yyyy") : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={endDate}
-                        onSelect={(date) => {
-                          setEndDate(date);
-                          setShowEndCalendar(false);
-                        }}
-                        disabled={(date) => date < (startDate || new Date())}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                    <span className="text-muted-foreground font-medium text-lg">–</span>
+
+                    {/* To Date */}
+                    <div className="flex flex-col items-center">
+                      <Popover open={showEndCalendar} onOpenChange={setShowEndCalendar}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
+                          >
+                            {format(scheduledVacation.end, "MMMM d, yyyy")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={scheduledVacation.end}
+                            onSelect={(date) => {
+                              if (date) {
+                                setScheduledVacation({ ...scheduledVacation, end: date });
+                                setShowEndCalendar(false);
+                              }
+                            }}
+                            disabled={(date) => date < (scheduledVacation.start || new Date())}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    onClick={handleCancelVacation}
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  >
+                    Cancel
+                  </Button>
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold text-foreground mb-2">Set Vacation Duration</h2>
+                <p className="text-muted-foreground mb-6 text-sm">
+                  Your routines will be paused and grayed out during your vacation
+                </p>
 
-              {startDate && endDate && (
-                <Button 
-                  onClick={handleScheduleVacation}
-                  className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-medium py-3"
-                >
-                  Schedule Vacation
-                </Button>
-              )}
-            </div>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center gap-4">
+                    {/* From Date */}
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm font-medium text-muted-foreground mb-2">From</span>
+                      <Popover open={showStartCalendar} onOpenChange={setShowStartCalendar}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-32 h-12 text-sm font-medium border-b-2 border-primary bg-transparent rounded-none",
+                              !startDate && "text-muted-foreground"
+                            )}
+                          >
+                            {startDate ? format(startDate, "MMM d, yyyy") : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={startDate}
+                            onSelect={(date) => {
+                              setStartDate(date);
+                              setShowStartCalendar(false);
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <span className="text-muted-foreground font-medium">to</span>
+
+                    {/* To Date */}
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm font-medium text-muted-foreground mb-2">To</span>
+                      <Popover open={showEndCalendar} onOpenChange={setShowEndCalendar}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-32 h-12 text-sm font-medium border-b-2 border-primary bg-transparent rounded-none",
+                              !endDate && "text-muted-foreground"
+                            )}
+                          >
+                            {endDate ? format(endDate, "MMM d, yyyy") : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={endDate}
+                            onSelect={(date) => {
+                              setEndDate(date);
+                              setShowEndCalendar(false);
+                            }}
+                            disabled={(date) => date < (startDate || new Date())}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  {startDate && endDate && (
+                    <Button 
+                      onClick={handleScheduleVacation}
+                      className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-medium py-3"
+                    >
+                      Schedule Vacation
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -232,15 +315,6 @@ const Vacation = () => {
         onSignOut={handleSignOut} 
       />
 
-      {scheduledVacation && (
-        <VacationSuccessDialog
-          open={showSuccessDialog}
-          onOpenChange={setShowSuccessDialog}
-          startDate={scheduledVacation.start}
-          endDate={scheduledVacation.end}
-          onCancel={handleCancelVacation}
-        />
-      )}
     </div>
   );
 };
