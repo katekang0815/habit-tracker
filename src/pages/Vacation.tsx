@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
@@ -217,7 +217,7 @@ const Vacation = () => {
                                 setShowStartCalendar(false);
                               }
                             }}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => date < addDays(new Date(), 1)}
                             initialFocus
                             className="pointer-events-auto"
                           />
@@ -311,7 +311,7 @@ const Vacation = () => {
                               setStartDate(date);
                               setShowStartCalendar(false);
                             }}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => date < addDays(new Date(), 1)}
                             initialFocus
                             className="pointer-events-auto"
                           />
