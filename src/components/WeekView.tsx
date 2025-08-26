@@ -58,7 +58,7 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate }: WeekViewProp
                   day.isBeforeHabits || day.isFuture
                     ? "bg-gray-300 text-gray-600 hover:bg-gray-400"
                     : day.isToday
-                    ? "bg-amber-800 text-white shadow-lg scale-105"
+                    ? "bg-amber-400 text-white shadow-lg scale-105"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
                 }`}
                 onClick={() => onDateChange(day.fullDate)}
