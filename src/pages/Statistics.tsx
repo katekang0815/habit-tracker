@@ -97,39 +97,39 @@ const Statistics = () => {
         </div>
 
         {/* Habit Statistics */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           {loading ? (
-            <div className="text-center py-8">
+            <div className="col-span-2 text-center py-8">
               <p className="text-muted-foreground">Loading statistics...</p>
             </div>
           ) : habitStats.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="col-span-2 text-center py-8">
               <p className="text-muted-foreground">No habits found for this month</p>
             </div>
           ) : (
             habitStats.map((stat, index) => (
-              <Card key={stat.habitId} className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
-                <div className="flex items-start gap-3 mb-3">
+              <Card key={stat.habitId} className="p-3 bg-card/50 backdrop-blur-sm border-border/50">
+                <div className="flex items-start gap-2 mb-3">
                   {stat.emoji && (
-                    <span className="text-2xl">{stat.emoji}</span>
+                    <span className="text-lg">{stat.emoji}</span>
                   )}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{stat.habitName}</h3>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground text-sm truncate">{stat.habitName}</h3>
                   </div>
                 </div>
 
                 {renderCalendarGrid(stat.completedDays, getHabitColor(index))}
 
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/30">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-muted-foreground/30"></div>
-                    <span className="text-sm font-medium text-foreground">
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
+                    <span className="text-xs font-medium text-foreground">
                       {stat.completionPercentage}%
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-foreground"></div>
-                    <span className="text-sm font-medium text-foreground">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-foreground"></div>
+                    <span className="text-xs font-medium text-foreground">
                       {stat.completedCount}
                     </span>
                   </div>
