@@ -74,14 +74,7 @@ const Vacation = () => {
     }
   };
 
-  const handleCancelVacation = async () => {
-    if (scheduledVacation?.id) {
-      // Find and delete the actual vacation schedule
-      const schedule = vacationSchedules.find(s => s.id === scheduledVacation.id);
-      if (schedule) {
-        await deleteVacationSchedule.mutateAsync(schedule.id);
-      }
-    }
+  const handleCancelVacation = () => {
     setScheduledVacation(null);
     setHasChanges(false);
   };
@@ -265,7 +258,7 @@ const Vacation = () => {
                     onClick={handleCancelVacation}
                     className="w-full text-muted-foreground hover:text-foreground"
                   >
-                    Cancel
+                    Back to Schedule
                   </Button>
                 </div>
               </>
