@@ -81,6 +81,45 @@ export const useVacationSchedules = () => {
     },
   });
 
+  const updateVacationSchedule = useMutation({
+    mutationFn: async ({ id, start_date, end_date }: { id: string; start_date: string; end_date: string }) => {
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("vacation_schedules")
+        .update({
+          start_date,
+          end_date,
+        })
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error updating vacation schedule:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vacation-schedules"] });
+      toast({
+        title: "Vacation updated!",
+        description: "Your vacation period has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating vacation schedule:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update vacation. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteVacationSchedule = useMutation({
     mutationFn: async (scheduleId: string) => {
       if (!user) throw new Error("User not authenticated");
@@ -128,6 +167,7 @@ export const useVacationSchedules = () => {
     vacationSchedules: vacationSchedules.data || [],
     isVacationSchedulesLoading: vacationSchedules.isLoading,
     addVacationSchedule,
+    updateVacationSchedule,
     deleteVacationSchedule,
     isDateInVacation,
   };

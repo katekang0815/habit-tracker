@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +11,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -19,14 +18,14 @@ import { cn } from "@/lib/utils";
 
 const Vacation = () => {
   const { user } = useAuth();
-  const { addVacationSchedule } = useVacationSchedules();
+  const { addVacationSchedule, updateVacationSchedule, vacationSchedules, deleteVacationSchedule } = useVacationSchedules();
   const { toast } = useToast();
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
-  
-  const [scheduledVacation, setScheduledVacation] = useState<{start: Date, end: Date} | null>(null);
+  const [scheduledVacation, setScheduledVacation] = useState<{start: Date, end: Date, id?: string} | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -75,9 +74,48 @@ const Vacation = () => {
     }
   };
 
-  const handleCancelVacation = () => {
+  const handleCancelVacation = async () => {
+    if (scheduledVacation?.id) {
+      // Find and delete the actual vacation schedule
+      const schedule = vacationSchedules.find(s => s.id === scheduledVacation.id);
+      if (schedule) {
+        await deleteVacationSchedule.mutateAsync(schedule.id);
+      }
+    }
     setScheduledVacation(null);
+    setHasChanges(false);
   };
+
+  const handleUpdateVacation = async () => {
+    if (!scheduledVacation?.id) return;
+    
+    try {
+      await updateVacationSchedule.mutateAsync({
+        id: scheduledVacation.id,
+        start_date: format(scheduledVacation.start, "yyyy-MM-dd"),
+        end_date: format(scheduledVacation.end, "yyyy-MM-dd"),
+      });
+      setHasChanges(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update vacation",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Check if there's an existing vacation schedule and set it
+  React.useEffect(() => {
+    if (vacationSchedules.length > 0 && !scheduledVacation) {
+      const latestSchedule = vacationSchedules[0]; // Get the first/latest schedule
+      setScheduledVacation({
+        start: new Date(latestSchedule.start_date),
+        end: new Date(latestSchedule.end_date),
+        id: latestSchedule.id
+      });
+    }
+  }, [vacationSchedules, scheduledVacation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 relative overflow-hidden">
@@ -168,6 +206,7 @@ const Vacation = () => {
                             onSelect={(date) => {
                               if (date) {
                                 setScheduledVacation({ ...scheduledVacation, start: date });
+                                setHasChanges(true);
                                 setShowStartCalendar(false);
                               }
                             }}
@@ -199,6 +238,7 @@ const Vacation = () => {
                             onSelect={(date) => {
                               if (date) {
                                 setScheduledVacation({ ...scheduledVacation, end: date });
+                                setHasChanges(true);
                                 setShowEndCalendar(false);
                               }
                             }}
@@ -210,6 +250,15 @@ const Vacation = () => {
                       </Popover>
                     </div>
                   </div>
+
+                  {hasChanges && (
+                    <Button 
+                      onClick={handleUpdateVacation}
+                      className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-medium py-3 mb-2"
+                    >
+                      Save Changes
+                    </Button>
+                  )}
 
                   <Button
                     variant="ghost"
@@ -314,7 +363,6 @@ const Vacation = () => {
         user={user} 
         onSignOut={handleSignOut} 
       />
-
     </div>
   );
 };
