@@ -82,6 +82,13 @@ const Vacation = () => {
         await deleteVacationSchedule.mutateAsync(schedule.id);
       }
     }
+    
+    // Show canceling notification
+    toast({
+      title: "Vacation canceled",
+      description: "Your vacation schedule has been removed.",
+    });
+    
     setScheduledVacation(null);
     setHasChanges(false);
   };
