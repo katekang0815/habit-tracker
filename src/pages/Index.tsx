@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useHabits } from "@/hooks/useHabits";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
+import { useWeeklyCompletions } from "@/hooks/useWeeklyCompletions";
 import type { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -20,6 +21,7 @@ const Index = () => {
   
   const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
+  const { weeklyCompletions } = useWeeklyCompletions(user, currentDate);
 
   useEffect(() => {
     // Set up auth state listener
@@ -97,7 +99,11 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
+        <WeekView 
+          currentDate={currentDate} 
+          onDateChange={setCurrentDate}
+          weeklyCompletions={weeklyCompletions}
+        />
       </div>
 
       {/* Main Content */}
