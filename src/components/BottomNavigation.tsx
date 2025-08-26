@@ -1,6 +1,7 @@
 import { Home, Plus, BarChart3, Users, Pause, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface BottomNavigationProps {
@@ -11,10 +12,13 @@ interface BottomNavigationProps {
 
 const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps) => {
   const [showSignOut, setShowSignOut] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const navItems = [
-    { icon: Home, label: "Home", active: true },
+    { icon: Home, label: "Home", path: "/" },
     { icon: Plus, label: "Add", isAdd: true },
-    { icon: BarChart3, label: "Stats" },
+    { icon: BarChart3, label: "Stats", path: "/statistics" },
     { icon: Users, label: "Social" },
     { icon: Pause, label: "Stop" },
     { icon: User, label: "Profile" },
@@ -48,11 +52,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                 onMouseLeave={() => setShowSignOut(false)}
               >
                 <button
-                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    item.active
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground"
                 >
                   <Icon className="w-5 h-5" />
                   <span className="text-xs font-medium">{item.label}</span>
@@ -78,8 +78,9 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
           return (
             <button
               key={item.label}
+              onClick={() => item.path && navigate(item.path)}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
-                item.active
+                location.pathname === item.path
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               }`}
