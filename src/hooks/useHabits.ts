@@ -46,12 +46,15 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     setLoading(true);
     try {
-      // Fetch habits
+      const dateStr = formatDate(selectedDate);
+      
+      // Fetch habits that were created on or before the selected date
       const { data: habitsData, error: habitsError } = await supabase
         .from('habits')
         .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true)
+        .lte('created_at', `${dateStr}T23:59:59.999Z`)
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
@@ -62,7 +65,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       }
 
       // Fetch completions for the selected date
-      const dateStr = formatDate(selectedDate);
       const { data: completionsData, error: completionsError } = await supabase
         .from('habit_completions')
         .select('*')
