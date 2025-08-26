@@ -5,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabitStatistics } from "@/hooks/useHabitStatistics";
+import { BottomNavigation } from "@/components/BottomNavigation";
+import { supabase } from "@/integrations/supabase/client";
 
 const Statistics = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { user } = useAuth();
   const { habitStats, loading } = useHabitStatistics(user, currentDate);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const goToPreviousMonth = () => {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -139,6 +145,12 @@ const Statistics = () => {
           )}
         </div>
       </div>
+      
+      <BottomNavigation 
+        onAddClick={() => {}} 
+        user={user} 
+        onSignOut={handleSignOut} 
+      />
     </div>
   );
 };
