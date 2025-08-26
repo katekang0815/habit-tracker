@@ -260,7 +260,10 @@ const Vacation = () => {
 
                   {hasChanges && (
                     <Button 
-                      onClick={handleUpdateVacation}
+                      onClick={() => {
+                        setHasChanges(false);
+                        handleUpdateVacation();
+                      }}
                       className="w-full bg-primary hover:bg-primary-glow text-primary-foreground font-medium py-3 mb-2"
                     >
                       Save Changes
