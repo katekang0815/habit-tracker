@@ -20,7 +20,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     { icon: Plus, label: "Add", isAdd: true },
     { icon: BarChart3, label: "Stats", path: "/statistics" },
     { icon: Users, label: "Social" },
-    { icon: Pause, label: "Stop" },
+    { icon: Pause, label: "Break" },
     { icon: User, label: "Profile" },
   ];
 
