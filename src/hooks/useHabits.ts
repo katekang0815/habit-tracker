@@ -56,7 +56,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .lte('created_at', selectedDate.toISOString())
+        .lte('created_at', `${dateStr}T23:59:59.999Z`)
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
