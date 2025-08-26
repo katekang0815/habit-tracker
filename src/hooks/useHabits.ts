@@ -9,6 +9,7 @@ export interface Habit {
   name: string;
   emoji?: string;
   is_active: boolean;
+  created_at: string;
   completed?: boolean;
   can_toggle?: boolean;
 }

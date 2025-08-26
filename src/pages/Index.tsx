@@ -83,6 +83,11 @@ const Index = () => {
 
   const completedToday = habits.filter(habit => habit.completed).length;
   const streakCount = 7; // Mock streak counter
+  
+  // Get the earliest habit creation date
+  const earliestHabitDate = habits.length > 0 
+    ? new Date(Math.min(...habits.map(habit => new Date(habit.created_at).getTime())))
+    : undefined;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
@@ -97,7 +102,7 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
+        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} earliestHabitDate={earliestHabitDate} />
       </div>
 
       {/* Main Content */}
