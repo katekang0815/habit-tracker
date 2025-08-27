@@ -18,6 +18,7 @@ const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
       date: parseInt(format(date, "d")),
       fullDate: date,
       isToday: isSameDay(date, today),
+      isFuture: date > today,
     };
   });
 
@@ -52,6 +53,8 @@ const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
                 className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
                   day.isToday
                     ? "bg-calendar-today text-white shadow-lg scale-105"
+                    : day.isFuture
+                    ? "bg-gray-100 text-gray-400 hover:bg-gray-200"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
                 }`}
                 onClick={() => onDateChange(day.fullDate)}
@@ -59,7 +62,7 @@ const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
                 {day.date}
               </div>
               <div className={`w-1 h-1 rounded-full mt-2 ${
-                day.isToday ? "bg-calendar-today" : "bg-primary"
+                day.isToday ? "bg-calendar-today" : day.isFuture ? "bg-gray-300" : "bg-primary"
               }`} />
             </div>
           ))}
