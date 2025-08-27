@@ -15,7 +15,7 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPerc
   
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(weekStart, i);
-    const isBeforeHabits = earliestHabitDate ? date <= earliestHabitDate : false;
+    const isBeforeHabits = earliestHabitDate ? date <= earliestHabitDate: false;
     return {
       name: format(date, "EEE"),
       date: parseInt(format(date, "d")),
