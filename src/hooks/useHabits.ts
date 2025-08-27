@@ -16,7 +16,7 @@ export interface Habit {
 export interface HabitCompletion {
   id: string;
   habit_id: string;
-  completion_date: string;
+  completion_date: string; // DATE in DB, e.g. "2025-08-27"
   completed: boolean;
 }
 
@@ -26,20 +26,24 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const { toast } = useToast();
   const { isDateInVacation } = useVacationSchedules();
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
+  // ---- Local-time helpers (no UTC conversions) ----
+  const pad2 = (n: number) => String(n).padStart(2, "0");
 
-  
-  const isToday = (date: Date) => {
-    const today = new Date();
-    return formatDate(date) === formatDate(today);
-  };
+  // "YYYY-MM-DD" in the user's LOCAL timezone
+  const formatDateLocal = (d: Date) =>
+    `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
-  const isFutureDate = (date: Date) => {
-    const today = new Date();
-    return date > today;
-  };
+  const startOfLocalDay = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  const startOfNextLocalDay = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+
+  const isTodayLocal = (d: Date) =>
+    formatDateLocal(d) === formatDateLocal(new Date());
+
+  const isFutureLocalDate = (d: Date) =>
+    startOfLocalDay(d) > startOfLocalDay(new Date());
 
   const fetchHabits = async () => {
     if (!user) {
@@ -49,16 +53,21 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     setLoading(true);
     try {
-      const dateStr = formatDate(selectedDate);
-      
-      // Fetch habits that were created on or before the selected date
+      // Local date string for DATE columns (e.g., completion_date)
+      const dateStr = formatDateLocal(selectedDate);
+
+      // Use "strictly less than next day's local midnight"
+      // Convert that local midnight to UTC string for the timestamptz comparison.
+      const nextLocalMidnightISO = startOfNextLocalDay(selectedDate).toISOString();
+
+      // Fetch habits created on/before the selected LOCAL day
       const { data: habitsData, error: habitsError } = await supabase
-        .from('habits')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .lte('created_at', `${dateStr}T23:59:59.999Z`)
-        .order('created_at', { ascending: true });
+        .from("habits")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .lt("created_at", nextLocalMidnightISO) // local-day boundary, robust to microseconds
+        .order("created_at", { ascending: true });
 
       if (habitsError) throw habitsError;
 
@@ -67,36 +76,34 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         return;
       }
 
-      // Fetch completions for the selected date
+      // Fetch completions for the LOCAL selected day (DATE column)
       const { data: completionsData, error: completionsError } = await supabase
-        .from('habit_completions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('completion_date', dateStr);
+        .from("habit_completions")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("completion_date", dateStr);
 
       if (completionsError) throw completionsError;
 
-      // Merge habits with their completion status
+      // Merge habits with completion status
       const completionsMap = new Map(
-        completionsData?.map(c => [c.habit_id, c.completed]) || []
+        (completionsData ?? []).map((c) => [c.habit_id, c.completed])
       );
 
-      const habitsWithStatus = habitsData.map(habit => ({
+      const habitsWithStatus = habitsData.map((habit) => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: !isFutureDate(selectedDate) && !isDateInVacation(selectedDate)
+        can_toggle:
+          !isFutureLocalDate(selectedDate) && !isDateInVacation(selectedDate),
       }));
-
-      console.log('Fetched habits with status:', habitsWithStatus);
-      console.log('Selected date:', dateStr, 'Is future:', isFutureDate(selectedDate), 'Is vacation:', isDateInVacation(selectedDate));
 
       setHabits(habitsWithStatus);
     } catch (error) {
-      console.error('Error fetching habits:', error);
+      console.error("Error fetching habits:", error);
       toast({
         title: "Error",
         description: "Failed to load habits",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -108,12 +115,14 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     try {
       const { data, error } = await supabase
-        .from('habits')
-        .insert([{
-          user_id: user.id,
-          name,
-          emoji
-        }])
+        .from("habits")
+        .insert([
+          {
+            user_id: user.id,
+            name,
+            emoji,
+          },
+        ])
         .select()
         .single();
 
@@ -121,158 +130,122 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       toast({
         title: "Success",
-        description: "Habit added successfully"
+        description: "Habit added successfully",
       });
 
       fetchHabits();
     } catch (error) {
-      console.error('Error adding habit:', error);
+      console.error("Error adding habit:", error);
       toast({
         title: "Error",
         description: "Failed to add habit",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const toggleHabit = async (habitId: string) => {
-    if (!user || isFutureDate(selectedDate) || isDateInVacation(selectedDate)) {
-      console.log('Toggle blocked - Future date or vacation:', { 
-        future: isFutureDate(selectedDate), 
-        vacation: isDateInVacation(selectedDate) 
+    // Block future or vacation days using LOCAL-day logic
+    if (!user || isFutureLocalDate(selectedDate) || isDateInVacation(selectedDate)) {
+      console.log("Toggle blocked - Future date or vacation:", {
+        future: isFutureLocalDate(selectedDate),
+        vacation: isDateInVacation(selectedDate),
       });
       return;
     }
 
-    const habit = habits.find(h => h.id === habitId);
+    const habit = habits.find((h) => h.id === habitId);
     if (!habit) {
-      console.log('Habit not found:', habitId);
+      console.log("Habit not found:", habitId);
       return;
     }
 
-    const dateStr = formatDate(selectedDate);
+    const dateStr = formatDateLocal(selectedDate);
     const newCompletedStatus = !habit.completed;
 
-    console.log('Toggling habit:', {
-      habitId,
-      habitName: habit.name,
-      currentStatus: habit.completed,
-      newStatus: newCompletedStatus,
-      date: dateStr
-    });
-
-    // Update local state immediately for better UX
-    setHabits(prev => {
-      const updated = prev.map(h => 
-        h.id === habitId ? { ...h, completed: newCompletedStatus } : h
-      );
-      console.log('Updated local state:', updated.find(h => h.id === habitId));
-      return updated;
-    });
+    // Optimistic UI
+    setHabits((prev) =>
+      prev.map((h) => (h.id === habitId ? { ...h, completed: newCompletedStatus } : h))
+    );
 
     try {
       const { data: existingCompletion } = await supabase
-        .from('habit_completions')
-        .select('id')
-        .eq('habit_id', habitId)
-        .eq('completion_date', dateStr)
-        .eq('user_id', user.id)
+        .from("habit_completions")
+        .select("id")
+        .eq("habit_id", habitId)
+        .eq("completion_date", dateStr)
+        .eq("user_id", user.id)
         .single();
 
       if (existingCompletion) {
-        console.log('Updating existing completion:', existingCompletion.id);
-        // Update existing completion
         const { error } = await supabase
-          .from('habit_completions')
+          .from("habit_completions")
           .update({ completed: newCompletedStatus })
-          .eq('id', existingCompletion.id);
-
+          .eq("id", existingCompletion.id);
         if (error) throw error;
       } else {
-        console.log('Creating new completion');
-        // Create new completion
-        const { error } = await supabase
-          .from('habit_completions')
-          .insert([{
+        const { error } = await supabase.from("habit_completions").insert([
+          {
             habit_id: habitId,
             user_id: user.id,
-            completion_date: dateStr,
-            completed: newCompletedStatus
-          }]);
-
+            completion_date: dateStr, // local day string
+            completed: newCompletedStatus,
+          },
+        ]);
         if (error) throw error;
       }
-
-      console.log('Database updated successfully');
-
     } catch (error) {
-      console.error('Error toggling habit:', error);
-      
-      // Revert local state on error
-      setHabits(prev => prev.map(h => 
-        h.id === habitId ? { ...h, completed: habit.completed } : h
-      ));
-      
+      console.error("Error toggling habit:", error);
+      // Revert on error
+      setHabits((prev) =>
+        prev.map((h) => (h.id === habitId ? { ...h, completed: habit.completed } : h))
+      );
       toast({
         title: "Error",
         description: "Failed to update habit",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const deleteHabit = async (habitId: string) => {
     if (!user) return;
-
     try {
       const { error } = await supabase
-        .from('habits')
+        .from("habits")
         .update({ is_active: false })
-        .eq('id', habitId)
-        .eq('user_id', user.id);
-
+        .eq("id", habitId)
+        .eq("user_id", user.id);
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Habit deleted successfully"
-      });
-
+      toast({ title: "Success", description: "Habit deleted successfully" });
       fetchHabits();
     } catch (error) {
-      console.error('Error deleting habit:', error);
+      console.error("Error deleting habit:", error);
       toast({
         title: "Error",
         description: "Failed to delete habit",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const pauseHabit = async (habitId: string) => {
     if (!user) return;
-
     try {
       const { error } = await supabase
-        .from('habits')
+        .from("habits")
         .update({ is_active: false })
-        .eq('id', habitId)
-        .eq('user_id', user.id);
-
+        .eq("id", habitId)
+        .eq("user_id", user.id);
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Habit paused successfully"
-      });
-
+      toast({ title: "Success", description: "Habit paused successfully" });
       fetchHabits();
     } catch (error) {
-      console.error('Error pausing habit:', error);
+      console.error("Error pausing habit:", error);
       toast({
         title: "Error",
         description: "Failed to pause habit",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -288,6 +261,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     toggleHabit,
     deleteHabit,
     pauseHabit,
-    refetch: fetchHabits
+    refetch: fetchHabits,
   };
 };
