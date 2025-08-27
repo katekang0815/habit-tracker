@@ -22,7 +22,6 @@ export interface HabitCompletion {
 export const useHabits = (user: User | null, selectedDate: Date) => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(false);
-  const [earliestHabitDate, setEarliestHabitDate] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const formatDate = (date: Date) => {
@@ -42,7 +41,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const fetchHabits = async () => {
     if (!user) {
       setHabits([]);
-      setEarliestHabitDate(null);
       return;
     }
 
@@ -60,22 +58,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
-
-      // Also fetch the earliest habit creation date for this user
-      const { data: earliestHabit, error: earliestError } = await supabase
-        .from('habits')
-        .select('created_at')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .single();
-
-      if (!earliestError && earliestHabit) {
-        setEarliestHabitDate(new Date(earliestHabit.created_at));
-      } else {
-        setEarliestHabitDate(null);
-      }
 
       if (!habitsData || habitsData.length === 0) {
         setHabits([]);
@@ -264,7 +246,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   return {
     habits,
     loading,
-    earliestHabitDate,
     addHabit,
     toggleHabit,
     deleteHabit,
