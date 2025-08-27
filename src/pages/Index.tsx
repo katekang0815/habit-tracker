@@ -16,10 +16,9 @@ const Index = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [user, setUser] = useState<User | null>(null);
-  const [earliestHabitDate, setEarliestHabitDate] = useState<Date | null>(null);
   const { toast } = useToast();
   
-  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, getEarliestHabitDate } = useHabits(user, currentDate);
+  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
 
   useEffect(() => {
@@ -82,21 +81,7 @@ const Index = () => {
     }
   };
 
-  // Fetch earliest habit date when user changes
-  useEffect(() => {
-    const fetchEarliestDate = async () => {
-      if (user) {
-        const earliest = await getEarliestHabitDate();
-        setEarliestHabitDate(earliest);
-      } else {
-        setEarliestHabitDate(null);
-      }
-    };
-    fetchEarliestDate();
-  }, [user, getEarliestHabitDate]);
-
   const completedToday = habits.filter(habit => habit.completed).length;
-  const completionPercentage = habits.length > 0 ? (completedToday / habits.length) * 100 : 0;
   const streakCount = 7; // Mock streak counter
 
   return (
@@ -112,12 +97,7 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView 
-          currentDate={currentDate} 
-          onDateChange={setCurrentDate} 
-          earliestHabitDate={earliestHabitDate}
-          completionPercentage={completionPercentage}
-        />
+        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
       </div>
 
       {/* Main Content */}

@@ -245,27 +245,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     fetchHabits();
   }, [user, selectedDate]);
 
-  // Function to get the earliest habit creation date
-  const getEarliestHabitDate = async (): Promise<Date | null> => {
-    if (!user) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('habits')
-        .select('created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true })
-        .limit(1);
-
-      if (error) throw error;
-
-      return data && data.length > 0 ? new Date(data[0].created_at) : null;
-    } catch (error) {
-      console.error('Error fetching earliest habit date:', error);
-      return null;
-    }
-  };
-
   return {
     habits,
     loading,
@@ -273,7 +252,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     toggleHabit,
     deleteHabit,
     pauseHabit,
-    refetch: fetchHabits,
-    getEarliestHabitDate
+    refetch: fetchHabits
   };
 };
