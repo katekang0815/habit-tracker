@@ -6,9 +6,10 @@ interface WeekViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   earliestHabitDate?: Date | null;
+  completionPercentage?: number;
 }
 
-const WeekView = ({ currentDate, onDateChange, earliestHabitDate }: WeekViewProps) => {
+const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPercentage = 0 }: WeekViewProps) => {
   const today = new Date();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
   
@@ -52,20 +53,46 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate }: WeekViewProp
               <span className="text-xs text-muted-foreground mb-2 font-medium">
                 {day.name}
               </span>
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
-                  day.isToday
-                    ? "bg-calendar-today text-white shadow-lg scale-105"
-                    : day.isFuture || day.isBeforeHabits
-                    ? "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                    : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
-                }`}
-                onClick={() => onDateChange(day.fullDate)}
-              >
-                {day.date}
-              </div>
+              {day.isToday ? (
+                <div 
+                  className="relative w-12 h-12 cursor-pointer transition-all duration-300 hover:scale-105"
+                  onClick={() => onDateChange(day.fullDate)}
+                >
+                  {/* Background circle */}
+                  <div className="absolute inset-0 w-12 h-12 rounded-full bg-gray-100" />
+                  
+                  {/* Progress fill */}
+                  <div 
+                    className="absolute inset-0 w-12 h-12 rounded-full bg-amber-300 transition-all duration-500"
+                    style={{
+                      background: `conic-gradient(
+                        #fbbf24 ${completionPercentage * 3.6}deg,
+                        #f3f4f6 ${completionPercentage * 3.6}deg
+                      )`
+                    }}
+                  />
+                  
+                  {/* Date number */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-gray-800 z-10">
+                      {day.date}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
+                    day.isFuture || day.isBeforeHabits
+                      ? "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                      : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
+                  }`}
+                  onClick={() => onDateChange(day.fullDate)}
+                >
+                  {day.date}
+                </div>
+              )}
               <div className={`w-1 h-1 rounded-full mt-2 ${
-                day.isToday ? "bg-calendar-today" : (day.isFuture || day.isBeforeHabits) ? "bg-gray-300" : "bg-primary"
+                day.isToday ? "bg-amber-300" : (day.isFuture || day.isBeforeHabits) ? "bg-gray-300" : "bg-primary"
               }`} />
             </div>
           ))}

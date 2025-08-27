@@ -96,6 +96,7 @@ const Index = () => {
   }, [user, getEarliestHabitDate]);
 
   const completedToday = habits.filter(habit => habit.completed).length;
+  const completionPercentage = habits.length > 0 ? (completedToday / habits.length) * 100 : 0;
   const streakCount = 7; // Mock streak counter
 
   return (
@@ -111,7 +112,12 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} earliestHabitDate={earliestHabitDate} />
+        <WeekView 
+          currentDate={currentDate} 
+          onDateChange={setCurrentDate} 
+          earliestHabitDate={earliestHabitDate}
+          completionPercentage={completionPercentage}
+        />
       </div>
 
       {/* Main Content */}
