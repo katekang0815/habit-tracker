@@ -9,7 +9,6 @@ import { Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useHabits } from "@/hooks/useHabits";
-import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import type { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -19,7 +18,6 @@ const Index = () => {
   const { toast } = useToast();
   
   const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
-  const { isDateInVacation } = useVacationSchedules();
 
   useEffect(() => {
     // Set up auth state listener
@@ -129,7 +127,6 @@ const Index = () => {
             onToggleHabit={toggleHabit}
             onDeleteHabit={deleteHabit}
             onPauseHabit={pauseHabit}
-            isVacationDate={isDateInVacation(currentDate)}
           />
         )}
         </div>

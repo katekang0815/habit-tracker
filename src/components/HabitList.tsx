@@ -21,10 +21,9 @@ interface HabitListProps {
   onToggleHabit: (id: string) => void;
   onDeleteHabit: (id: string) => void;
   onPauseHabit: (id: string) => void;
-  isVacationDate?: boolean;
 }
 
-const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, isVacationDate = false }: HabitListProps) => {
+const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit }: HabitListProps) => {
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
 
   const handleToggleHabit = (id: string) => {
@@ -57,7 +56,7 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, isVacat
           key={habit.id}
           className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
             !habit.can_toggle ? 'opacity-50' : ''
-          } ${isVacationDate ? 'opacity-70' : ''}`}
+          }`}
         >
           <div className="flex items-center gap-4">
             <span className="text-lg font-medium text-muted-foreground">
@@ -68,9 +67,7 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, isVacat
               {habit.emoji && (
                 <span className="text-xl">{habit.emoji}</span>
               )}
-              <span className={`font-medium transition-all duration-300 text-foreground ${
-                isVacationDate ? 'line-through text-muted-foreground' : ''
-              }`}>
+              <span className="font-medium transition-all duration-300 text-foreground">
                 {habit.name}
               </span>
             </div>
