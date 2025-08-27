@@ -89,6 +89,9 @@ const Index = () => {
     ? new Date(Math.min(...habits.map(habit => new Date(habit.created_at).getTime())))
     : undefined;
 
+  // Calculate completion percentage for today
+  const completionPercentage = habits.length > 0 ? (completedToday / habits.length) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <div className="max-w-xl mx-auto">
@@ -102,7 +105,12 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} earliestHabitDate={earliestHabitDate} />
+        <WeekView 
+          currentDate={currentDate} 
+          onDateChange={setCurrentDate} 
+          earliestHabitDate={earliestHabitDate}
+          completionPercentage={completionPercentage}
+        />
       </div>
 
       {/* Main Content */}
