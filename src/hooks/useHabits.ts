@@ -83,7 +83,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const habitsWithStatus = habitsData.map(habit => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: isToday(selectedDate) && !isFutureDate(selectedDate) && !isDateInVacation(selectedDate)
+        can_toggle: !isFutureDate(selectedDate) && !isDateInVacation(selectedDate)
       }));
 
       setHabits(habitsWithStatus);
@@ -132,7 +132,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   };
 
   const toggleHabit = async (habitId: string) => {
-    if (!user || !isToday(selectedDate) || isDateInVacation(selectedDate)) return;
+    if (!user || isFutureDate(selectedDate) || isDateInVacation(selectedDate)) return;
 
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
