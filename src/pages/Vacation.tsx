@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
@@ -48,7 +48,7 @@ const Vacation = () => {
     if (startDate > endDate) {
       toast({
         title: "Error",
-        description: "Start date must be before or same as end date",
+        description: "Start date must be before end date",
         variant: "destructive",
       });
       return;
@@ -217,7 +217,7 @@ const Vacation = () => {
                                 setShowStartCalendar(false);
                               }
                             }}
-                            disabled={(date) => date < addDays(new Date(), 1)}
+                            disabled={(date) => date < new Date()}
                             initialFocus
                             className="pointer-events-auto"
                           />
@@ -249,7 +249,7 @@ const Vacation = () => {
                                 setShowEndCalendar(false);
                               }
                             }}
-                            disabled={(date) => date < scheduledVacation.start}
+                            disabled={(date) => date < (scheduledVacation.start || new Date())}
                             initialFocus
                             className="pointer-events-auto"
                           />
@@ -311,7 +311,7 @@ const Vacation = () => {
                               setStartDate(date);
                               setShowStartCalendar(false);
                             }}
-                            disabled={(date) => date < addDays(new Date(), 1)}
+                            disabled={(date) => date < new Date()}
                             initialFocus
                             className="pointer-events-auto"
                           />
@@ -344,7 +344,7 @@ const Vacation = () => {
                               setEndDate(date);
                               setShowEndCalendar(false);
                             }}
-                            disabled={(date) => startDate && date < startDate}
+                            disabled={(date) => date < (startDate || new Date())}
                             initialFocus
                             className="pointer-events-auto"
                           />
