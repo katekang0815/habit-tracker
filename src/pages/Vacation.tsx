@@ -48,7 +48,7 @@ const Vacation = () => {
     if (startDate > endDate) {
       toast({
         title: "Error",
-        description: "Start date must be before end date",
+        description: "Start date must be before or same as end date",
         variant: "destructive",
       });
       return;
@@ -249,7 +249,7 @@ const Vacation = () => {
                                 setShowEndCalendar(false);
                               }
                             }}
-                            disabled={(date) => date < (scheduledVacation.start || new Date())}
+                            disabled={(date) => date < scheduledVacation.start}
                             initialFocus
                             className="pointer-events-auto"
                           />
@@ -344,7 +344,7 @@ const Vacation = () => {
                               setEndDate(date);
                               setShowEndCalendar(false);
                             }}
-                            disabled={(date) => date < (startDate || new Date())}
+                            disabled={(date) => startDate && date < startDate}
                             initialFocus
                             className="pointer-events-auto"
                           />
