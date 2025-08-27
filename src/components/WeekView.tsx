@@ -53,7 +53,7 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPerc
               <span className="text-xs text-muted-foreground mb-2 font-medium">
                 {day.name}
               </span>
-              {isSameDay(day.fullDate, currentDate) ? (
+              {day.isToday ? (
                 <div 
                   className="relative w-12 h-12 cursor-pointer transition-all duration-300 hover:scale-105"
                   onClick={() => onDateChange(day.fullDate)}
@@ -92,7 +92,7 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPerc
                 </div>
               )}
               <div className={`w-1 h-1 rounded-full mt-2 ${
-                isSameDay(day.fullDate, currentDate) ? "bg-amber-300" : (day.isFuture || day.isBeforeHabits) ? "bg-gray-300" : "bg-primary"
+                day.isToday ? "bg-amber-300" : (day.isFuture || day.isBeforeHabits) ? "bg-gray-300" : "bg-primary"
               }`} />
             </div>
           ))}
