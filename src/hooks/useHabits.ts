@@ -29,7 +29,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0];
   };
-  console.log('date: ', date)  
+  console.log('DATE: ', date)  
   
   const isToday = (date: Date) => {
     const today = new Date();
