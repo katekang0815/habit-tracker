@@ -17,7 +17,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   
-  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
+  const { habits, loading, earliestHabitDate, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
 
   useEffect(() => {
     // Set up auth state listener
@@ -95,7 +95,7 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
+        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} earliestHabitDate={earliestHabitDate} />
       </div>
 
       {/* Main Content */}
