@@ -4,6 +4,7 @@ import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { CompletionPieChart } from "@/components/CompletionPieChart";
 import { Button } from "@/components/ui/button";
 import { Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,9 +90,6 @@ const Index = () => {
     ? new Date(Math.min(...habits.map(habit => new Date(habit.created_at).getTime())))
     : undefined;
 
-  // Calculate completion percentage for today
-  const completionPercentage = habits.length > 0 ? (completedToday / habits.length) * 100 : 0;
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <div className="max-w-xl mx-auto">
@@ -99,18 +97,16 @@ const Index = () => {
         <div className="px-4 pt-8 pb-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
-          <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
-            <Flame className="w-4 h-4 text-streak-flame" />
-            <span className="text-sm font-semibold text-foreground">{streakCount}</span>
+          <div className="flex items-center gap-3">
+            <CompletionPieChart completed={completedToday} total={habits.length} />
+            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
+              <Flame className="w-4 h-4 text-streak-flame" />
+              <span className="text-sm font-semibold text-foreground">{streakCount}</span>
+            </div>
           </div>
         </div>
         
-        <WeekView 
-          currentDate={currentDate} 
-          onDateChange={setCurrentDate} 
-          earliestHabitDate={earliestHabitDate}
-          completionPercentage={completionPercentage}
-        />
+        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} earliestHabitDate={earliestHabitDate} />
       </div>
 
       {/* Main Content */}

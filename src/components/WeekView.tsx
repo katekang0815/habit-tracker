@@ -6,10 +6,9 @@ interface WeekViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   earliestHabitDate?: Date;
-  completionPercentage?: number;
 }
 
-const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPercentage = 0 }: WeekViewProps) => {
+const WeekView = ({ currentDate, onDateChange, earliestHabitDate }: WeekViewProps) => {
   const today = new Date();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
   
@@ -54,28 +53,18 @@ const WeekView = ({ currentDate, onDateChange, earliestHabitDate, completionPerc
               <span className="text-xs text-muted-foreground mb-2 font-medium">
                 {day.name}
               </span>
-{day.isToday ? (
-                <div 
-                  className="w-12 h-12 rounded-full relative flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer shadow-lg scale-105 overflow-hidden"
-                  onClick={() => onDateChange(day.fullDate)}
-                  style={{
-                    background: `conic-gradient(#fbbf24 ${completionPercentage * 3.6}deg, #f3f4f6 ${completionPercentage * 3.6}deg)`
-                  }}
-                >
-                  <span className="text-white relative z-10">{day.date}</span>
-                </div>
-              ) : (
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
-                    day.isBeforeHabits || day.isFuture
-                      ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
-                  }`}
-                  onClick={() => onDateChange(day.fullDate)}
-                >
-                  {day.date}
-                </div>
-              )}
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
+                  day.isBeforeHabits || day.isFuture
+                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : day.isToday
+                    ? "bg-amber-400 text-white shadow-lg scale-105"
+                    : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
+                }`}
+                onClick={() => onDateChange(day.fullDate)}
+              >
+                {day.date}
+              </div>
               <div className={`w-1 h-1 rounded-full mt-2 ${
                 day.isBeforeHabits || day.isFuture 
                   ? "bg-gray-300" 
