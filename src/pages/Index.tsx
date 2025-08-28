@@ -18,7 +18,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   
-  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit } = useHabits(user, currentDate);
+  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
 
   useEffect(() => {
@@ -129,6 +129,7 @@ const Index = () => {
             onToggleHabit={toggleHabit}
             onDeleteHabit={deleteHabit}
             onPauseHabit={pauseHabit}
+            onActivateHabit={activateHabit}
             isVacationDate={isDateInVacation(currentDate)}
           />
         )}

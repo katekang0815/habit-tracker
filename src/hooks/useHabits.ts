@@ -52,12 +52,11 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const dateStr = formatDateLocal(selectedDate); // for DATE comparisons
       const nextLocalMidnightISO = startOfNextLocalDay(selectedDate).toISOString(); // for timestamptz
 
-      // Habits created on/before the selected LOCAL day
+      // Habits created on/before the selected LOCAL day (include both active and paused)
       const { data: habitsData, error: habitsError } = await supabase
         .from("habits")
         .select("*")
         .eq("user_id", user.id)
-        .eq("is_active", true)
         .lt("created_at", nextLocalMidnightISO) // strictly before next day's local midnight
         .order("created_at", { ascending: true });
 
@@ -241,6 +240,30 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     }
   };
 
+  const activateHabit = async (habitId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from("habits")
+        .update({ is_active: true })
+        .eq("id", habitId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      toast({ title: "Success", description: "Habit activated successfully" });
+      fetchHabits();
+    } catch (error) {
+      console.error("Error activating habit:", error);
+      toast({
+        title: "Error",
+        description: "Failed to activate habit",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchHabits();
   }, [user, selectedDate]);
@@ -252,6 +275,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     toggleHabit,
     deleteHabit,
     pauseHabit,
+    activateHabit,
     refetch: fetchHabits,
   };
 };
