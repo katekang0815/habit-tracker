@@ -187,9 +187,19 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     if (!user) return;
 
     try {
+      // First delete all habit completions for this habit
+      const { error: completionsError } = await supabase
+        .from("habit_completions")
+        .delete()
+        .eq("habit_id", habitId)
+        .eq("user_id", user.id);
+
+      if (completionsError) throw completionsError;
+
+      // Then delete the habit itself
       const { error } = await supabase
         .from("habits")
-        .update({ is_active: false })
+        .delete()
         .eq("id", habitId)
         .eq("user_id", user.id);
 
