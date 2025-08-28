@@ -112,11 +112,19 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       toast({ title: "Success", description: "Habit added successfully" });
       fetchHabits();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding habit:", error);
+      
+      // Check if it's a duplicate habit error
+      const isDuplicateError = error?.code === '23505' || 
+                              error?.message?.includes('duplicate') ||
+                              error?.message?.includes('unique constraint');
+      
       toast({
         title: "Error",
-        description: "Failed to add habit",
+        description: isDuplicateError 
+          ? "You already added this habit" 
+          : "Failed to add habit",
         variant: "destructive",
       });
     }
