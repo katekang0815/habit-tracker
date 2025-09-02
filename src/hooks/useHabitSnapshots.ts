@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { formatPacificDateString, isPacificToday } from '@/lib/pacific-time';
 import type { User } from '@supabase/supabase-js';
 
 export interface HabitSnapshot {
@@ -24,13 +25,8 @@ export const useHabitSnapshots = (user: User | null, selectedDate: Date) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const formatDate = (date: Date): string => {
-    return date.toISOString().split('T')[0];
-  };
-
   const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return formatDate(date) === formatDate(today);
+    return isPacificToday(date);
   };
 
   const fetchSnapshot = async (date: Date) => {
@@ -38,7 +34,7 @@ export const useHabitSnapshots = (user: User | null, selectedDate: Date) => {
 
     setLoading(true);
     try {
-      const dateStr = formatDate(date);
+      const dateStr = formatPacificDateString(date);
       
       const { data, error } = await supabase
         .from('habit_snapshots')

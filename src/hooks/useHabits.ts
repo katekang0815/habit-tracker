@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import { useHabitSnapshots, type SnapshotHabit } from "@/hooks/useHabitSnapshots";
+import { formatPacificDateString, isPacificToday, isPacificFutureDate, getNextPacificDayStart } from "@/lib/pacific-time";
 import type { User } from "@supabase/supabase-js";
 
 export interface Habit {
@@ -26,20 +27,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { isDateInVacation } = useVacationSchedules();
-  const { fetchSnapshot, isToday, runMigration } = useHabitSnapshots(user, selectedDate);
-
-  // ---------- Local-time helpers ----------
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-
-  // "YYYY-MM-DD" in user's LOCAL timezone (no UTC conversion)
-  const formatDateLocal = (d: Date) =>
-    `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-
-  const startOfLocalDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const startOfNextLocalDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
-
-  const isFutureLocalDate = (d: Date) =>
-    startOfLocalDay(d) > startOfLocalDay(new Date());
+  const { fetchSnapshot, runMigration } = useHabitSnapshots(user, selectedDate);
 
   // ----------------------------------------
 
@@ -52,7 +40,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     setLoading(true);
     try {
       // For historical dates (not today), fetch from snapshots
-      if (!isToday(selectedDate)) {
+      if (!isPacificToday(selectedDate)) {
         const snapshotHabits = await fetchSnapshot(selectedDate);
         
         if (snapshotHabits && snapshotHabits.length > 0) {
@@ -72,15 +60,15 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       }
 
       // For today or when no snapshot exists, use dynamic data
-      const dateStr = formatDateLocal(selectedDate); // for DATE comparisons
-      const nextLocalMidnightISO = startOfNextLocalDay(selectedDate).toISOString(); // for timestamptz
+      const dateStr = formatPacificDateString(selectedDate); // for DATE comparisons
+      const nextPacificDayISO = getNextPacificDayStart(selectedDate).toISOString(); // for timestamptz
 
       // Habits created on/before the selected LOCAL day (include both active and paused)
       const { data: habitsData, error: habitsError } = await supabase
         .from("habits")
         .select("*")
         .eq("user_id", user.id)
-        .lt("created_at", nextLocalMidnightISO) // strictly before next day's local midnight
+        .lt("created_at", nextPacificDayISO) // strictly before next day's Pacific midnight
         .order("created_at", { ascending: true });
 
       if (habitsError) throw habitsError;
@@ -106,7 +94,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const habitsWithStatus = habitsData.map((habit: Habit) => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: !isFutureLocalDate(selectedDate) && !isDateInVacation(selectedDate),
+        can_toggle: !isPacificFutureDate(selectedDate) && !isDateInVacation(selectedDate),
       }));
 
       setHabits(habitsWithStatus);
@@ -153,10 +141,10 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   };
 
   const toggleHabit = async (habitId: string) => {
-    // Block future or vacation dates using LOCAL-day logic
-    if (!user || isFutureLocalDate(selectedDate) || isDateInVacation(selectedDate)) {
+    // Block future or vacation dates using Pacific timezone logic
+    if (!user || isPacificFutureDate(selectedDate) || isDateInVacation(selectedDate)) {
       console.log("Toggle blocked - Future date or vacation:", {
-        future: isFutureLocalDate(selectedDate),
+        future: isPacificFutureDate(selectedDate),
         vacation: isDateInVacation(selectedDate),
       });
       return;
@@ -168,7 +156,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       return;
     }
 
-    const dateStr = formatDateLocal(selectedDate);
+    const dateStr = formatPacificDateString(selectedDate);
     const newCompletedStatus = !habit.completed;
 
     // Optimistic UI
@@ -184,7 +172,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
           {
             habit_id: habitId,
             user_id: user.id,
-            completion_date: dateStr, // local calendar day
+            completion_date: dateStr, // Pacific timezone calendar day
             completed: newCompletedStatus,
           },
           { onConflict: "user_id,habit_id,completion_date" }

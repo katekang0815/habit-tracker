@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfMonth, endOfMonth, getDaysInMonth } from "date-fns";
+import { formatPacificDateString, toPacificDate } from "@/lib/pacific-time";
 import type { User } from "@supabase/supabase-js";
 
 export interface HabitStatistic {
@@ -24,9 +25,11 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
 
     setLoading(true);
     try {
-      const monthStart = startOfMonth(currentDate);
-      const monthEnd = endOfMonth(currentDate);
-      const daysInMonth = getDaysInMonth(currentDate);
+      // Convert to Pacific timezone for consistent date handling
+      const pacificDate = toPacificDate(currentDate);
+      const monthStart = startOfMonth(pacificDate);
+      const monthEnd = endOfMonth(pacificDate);
+      const daysInMonth = getDaysInMonth(pacificDate);
 
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
@@ -34,7 +37,7 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         .select('id, name, emoji, created_at')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .lte('created_at', format(monthEnd, 'yyyy-MM-dd'))
+        .lte('created_at', formatPacificDateString(monthEnd))
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
@@ -49,8 +52,8 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         .from('habit_completions')
         .select('habit_id, completion_date, completed')
         .eq('user_id', user.id)
-        .gte('completion_date', format(monthStart, 'yyyy-MM-dd'))
-        .lte('completion_date', format(monthEnd, 'yyyy-MM-dd'))
+        .gte('completion_date', formatPacificDateString(monthStart))
+        .lte('completion_date', formatPacificDateString(monthEnd))
         .eq('completed', true);
 
       if (completionsError) throw completionsError;

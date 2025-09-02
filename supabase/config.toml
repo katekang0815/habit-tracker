@@ -1,1 +1,47 @@
 project_id = "fqxzagupsrcufamajbhz"
+
+[functions]
+
+[functions.migrate-habits]
+verify_jwt = false
+
+[functions.daily-habit-snapshot]
+verify_jwt = false
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[edge-runtime]
+enabled = true
+port = 54324
+
+[analytics]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+
+[auth.external.github]
+enabled = false
+
+[auth.external.google]
+enabled = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
