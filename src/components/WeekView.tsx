@@ -60,7 +60,7 @@ const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
               >
                 {day.date}
               </div>
-              <div className={`w-1 h-1 rounded-full mt-2 ${
+              <div className={`w-2 h-2 rounded-full mt-2 ${
                 day.isToday ? "bg-calendar-today" : "bg-amber-600"
               }`} />
             </div>
