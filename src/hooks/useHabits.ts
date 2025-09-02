@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
+import { useHabitSnapshots, type SnapshotHabit } from "@/hooks/useHabitSnapshots";
 import type { User } from "@supabase/supabase-js";
 
 export interface Habit {
@@ -25,6 +26,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { isDateInVacation } = useVacationSchedules();
+  const { fetchSnapshot, isToday, runMigration } = useHabitSnapshots(user, selectedDate);
 
   // ---------- Local-time helpers ----------
   const pad2 = (n: number) => String(n).padStart(2, "0");
@@ -49,6 +51,27 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     setLoading(true);
     try {
+      // For historical dates (not today), fetch from snapshots
+      if (!isToday(selectedDate)) {
+        const snapshotHabits = await fetchSnapshot(selectedDate);
+        
+        if (snapshotHabits && snapshotHabits.length > 0) {
+          const habitsWithStatus = snapshotHabits.map((snapshot: SnapshotHabit) => ({
+            id: snapshot.habit_id,
+            name: snapshot.habit_name,
+            emoji: '', // Not stored in snapshots
+            is_active: snapshot.is_active,
+            completed: snapshot.completed,
+            can_toggle: false, // Historical data is read-only
+          }));
+          
+          setHabits(habitsWithStatus);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // For today or when no snapshot exists, use dynamic data
       const dateStr = formatDateLocal(selectedDate); // for DATE comparisons
       const nextLocalMidnightISO = startOfNextLocalDay(selectedDate).toISOString(); // for timestamptz
 
@@ -277,5 +300,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     pauseHabit,
     activateHabit,
     refetch: fetchHabits,
+    runMigration, // Expose migration function
   };
 };
