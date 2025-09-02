@@ -52,6 +52,30 @@ export type Database = {
           },
         ]
       }
+      habit_snapshots: {
+        Row: {
+          created_at: string
+          habits_data: Json
+          id: string
+          snapshot_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          habits_data: Json
+          id?: string
+          snapshot_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          habits_data?: Json
+          id?: string
+          snapshot_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       habits: {
         Row: {
           created_at: string
@@ -141,7 +165,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_habit_completions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_daily_habit_snapshot: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      migrate_historical_habits_to_snapshots: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
