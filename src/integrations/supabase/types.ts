@@ -173,9 +173,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      current_pacific_date: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       migrate_historical_habits_to_snapshots: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      utc_to_pacific_date: {
+        Args: { utc_timestamp: string }
+        Returns: string
       }
     }
     Enums: {
