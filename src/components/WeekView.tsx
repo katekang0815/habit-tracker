@@ -61,7 +61,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
               >
                 {day.date}
               </div>
-              <div className={`w-2 h-2 rounded-full mt-2 ${
+              <div className={`w-1 h-1 rounded-full mt-2 ${
                 day.isToday ? "bg-calendar-today" : 
                 isToggled?.(day.fullDate) ? "bg-amber-600" : 
                 "bg-gray-300"
