@@ -54,7 +54,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
                   day.isToday
                     ? "bg-calendar-today text-white shadow-lg scale-105"
                     : isSameDay(day.fullDate, currentDate)
-                    ? "bg-amber-600 text-white shadow-lg scale-105"
+                    ? "bg-amber-400 text-white shadow-lg scale-105"
                     : day.fullDate > today
                     ? "bg-muted text-muted-foreground"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
