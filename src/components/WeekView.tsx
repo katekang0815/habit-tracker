@@ -63,7 +63,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
               >
                 {day.date}
               </div>
-         
+            </div>
           ))}
         </div>
         <Button
