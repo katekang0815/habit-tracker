@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 interface WeekViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
+  isToggled?: (date: Date) => boolean;
 }
 
-const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
+const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   const today = new Date();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
   
@@ -61,7 +62,9 @@ const WeekView = ({ currentDate, onDateChange }: WeekViewProps) => {
                 {day.date}
               </div>
               <div className={`w-2 h-2 rounded-full mt-2 ${
-                day.isToday ? "bg-calendar-today" : "bg-amber-600"
+                day.isToday ? "bg-calendar-today" : 
+                isToggled?.(day.fullDate) ? "bg-amber-600" : 
+                "bg-gray-300"
               }`} />
             </div>
           ))}
