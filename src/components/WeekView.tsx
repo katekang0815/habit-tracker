@@ -24,14 +24,12 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
 
   const goToPreviousWeek = () => {
     const previousWeek = subWeeks(currentDate, 1);
-    // Reset to today to remove amber highlighting and apply primary styling to the week
-    onDateChange(today);
+    onDateChange(previousWeek);
   };
 
   const goToNextWeek = () => {
     const nextWeek = addWeeks(currentDate, 1);
-    // Reset to today to remove amber highlighting and apply primary styling to the week
-    onDateChange(today);
+    onDateChange(nextWeek);
   };
 
   const handleDateClick = (date: Date) => {
