@@ -1,6 +1,7 @@
-import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from "date-fns";
+import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks, isWithinInterval } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -11,6 +12,11 @@ interface WeekViewProps {
 const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   const today = new Date();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
+  const weekEnd = addDays(weekStart, 6);
+  
+  // Track if we're in a navigated week (not the current week)
+  const [isNavigatedWeek, setIsNavigatedWeek] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(weekStart, i);
@@ -24,24 +30,31 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
 
   const goToPreviousWeek = () => {
     const previousWeek = subWeeks(currentDate, 1);
-    // Reset selection to remove amber highlighting and show primary styling
+    // Reset selection and mark as navigated week
+    setSelectedDate(null);
+    setIsNavigatedWeek(true);
     onDateChange(previousWeek);
   };
 
   const goToNextWeek = () => {
     const nextWeek = addWeeks(currentDate, 1);
-    // Reset selection to remove amber highlighting and show primary styling
+    // Reset selection and mark as navigated week
+    setSelectedDate(null);
+    setIsNavigatedWeek(true);
     onDateChange(nextWeek);
   };
 
   const handleDateClick = (date: Date) => {
-    // If clicking the same date, toggle back to original styling by setting a different date
-    if (isSameDay(date, currentDate)) {
-      // Set to today's date to deselect
-      onDateChange(today);
+    // When clicking a date, clear the navigated week state
+    setIsNavigatedWeek(false);
+    
+    // If clicking the same date, deselect it
+    if (selectedDate && isSameDay(date, selectedDate)) {
+      setSelectedDate(null);
     } else {
-      onDateChange(date);
+      setSelectedDate(date);
     }
+    onDateChange(date);
   };
 
   return (
@@ -65,8 +78,10 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
                 className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
                   day.isToday
                     ? "bg-calendar-today text-white shadow-lg scale-105"
-                    : isSameDay(day.fullDate, currentDate)
+                    : selectedDate && isSameDay(day.fullDate, selectedDate) && !isNavigatedWeek
                     ? "bg-amber-400 text-white shadow-lg scale-105"
+                    : isNavigatedWeek && day.fullDate <= today
+                    ? "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
                     : day.fullDate > today
                     ? "bg-muted text-muted-foreground"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
