@@ -24,11 +24,13 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
 
   const goToPreviousWeek = () => {
     const previousWeek = subWeeks(currentDate, 1);
+    // Reset selection to remove amber highlighting and show primary styling
     onDateChange(previousWeek);
   };
 
   const goToNextWeek = () => {
     const nextWeek = addWeeks(currentDate, 1);
+    // Reset selection to remove amber highlighting and show primary styling
     onDateChange(nextWeek);
   };
 
