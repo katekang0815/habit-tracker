@@ -32,6 +32,16 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
     onDateChange(nextWeek);
   };
 
+  const handleDateClick = (date: Date) => {
+    // If clicking the same date, toggle back to original styling by setting a different date
+    if (isSameDay(date, currentDate)) {
+      // Set to today's date to deselect
+      onDateChange(today);
+    } else {
+      onDateChange(date);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -59,7 +69,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
                     ? "bg-muted text-muted-foreground"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
                 }`}
-                onClick={() => onDateChange(day.fullDate)}
+                onClick={() => handleDateClick(day.fullDate)}
               >
                 {day.date}
               </div>
