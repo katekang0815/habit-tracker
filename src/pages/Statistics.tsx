@@ -127,8 +127,8 @@ const Statistics = () => {
                 {renderCalendarGrid(stat.completedDays, getHabitColor(index))}
 
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
-                  <div className="flex items-center gap-6">
-                    <div className="w-2 h-2 gap-1 rounded-full bg-muted-foreground/30"></div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
                     <span className="text-xs font-medium text-foreground">
                       {stat.completionPercentage}%
                     </span>
