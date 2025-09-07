@@ -30,11 +30,11 @@ const Statistics = () => {
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     
     return (
-      <div className="grid grid-cols-7 gap-1 mt-3">
+      <div className="grid grid-cols-7 gap-1 p-4 mt-3">
         {days.map((day) => (
           <div
             key={day}
-            className={`w-8 h-8 gap-4 p-2 m-2 rounded-sm flex items-center justify-center text-xs font-medium transition-all ${
+            className={`w-6 h-12 gap-4 p-2 m-2 rounded-sm flex items-center justify-center text-xs font-medium transition-all ${
               completedDays.has(day)
                 ? `${habitColor} text-white`
                 : "bg-muted/30 text-muted-foreground"
