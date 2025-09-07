@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabitStatistics } from "@/hooks/useHabitStatistics";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { CleanupButton } from "@/components/CleanupButton";
 import { supabase } from "@/integrations/supabase/client";
 
 const Statistics = () => {
@@ -100,6 +101,11 @@ const Statistics = () => {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+
+        {/* Cleanup Button */}
+        <div className="mb-6 flex justify-center">
+          <CleanupButton />
         </div>
 
         {/* Habit Statistics */}
