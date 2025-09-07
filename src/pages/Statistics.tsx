@@ -31,20 +31,21 @@ const Statistics = () => {
     
     return (
       <div className="grid grid-cols-7 gap-2 mt-3">
-        {days.map((day) => (
-          <div key={day} className="p-2">
-            <div
-              className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium transition-all
-                ${completedDays.has(day)
-                  ? `${habitColor} text-white`
-                  : "bg-muted/30 text-muted-foreground"}
-                ring-1 ring-border/40 ring-offset-1 ring-offset-background`}
-            >
-              {day}
-            </div>
-          </div>
-        ))}
+  {days.map((day) => (
+    <div key={day} className="min-w-0"> {/* allow shrinking inside grid cell */}
+      <div
+        className={`w-full aspect-square rounded-md flex items-center justify-center
+                    text-[10px] sm:text-xs overflow-hidden
+                    ${completedDays.has(day)
+                      ? `${habitColor} text-white`
+                      : "bg-muted/30 text-muted-foreground"}`}
+      >
+        {day}
       </div>
+    </div>
+  ))}
+</div>
+
     );
   };
 
