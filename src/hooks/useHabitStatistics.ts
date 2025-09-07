@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfMonth, endOfMonth, getDaysInMonth } from "date-fns";
-import { formatPacificDateString, toPacificDate } from "@/lib/pacific-time";
+import { formatPacificDateString, toPacificDate, isPacificToday } from "@/lib/pacific-time";
 import type { User } from "@supabase/supabase-js";
 
 export interface HabitStatistic {
@@ -47,25 +47,55 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         return;
       }
 
-      // Fetch completions for the month
-      const { data: completionsData, error: completionsError } = await supabase
+      // Get today's date in Pacific time
+      const today = formatPacificDateString(new Date());
+      
+      // Initialize completion map
+      const completionsByHabit = new Map<string, Set<number>>();
+
+      // Query habit_completions for today's date only
+      const { data: todayCompletions, error: todayError } = await supabase
         .from('habit_completions')
         .select('habit_id, completion_date, completed')
         .eq('user_id', user.id)
-        .gte('completion_date', formatPacificDateString(monthStart))
-        .lte('completion_date', formatPacificDateString(monthEnd))
+        .eq('completion_date', today)
         .eq('completed', true);
 
-      if (completionsError) throw completionsError;
+      if (todayError) throw todayError;
 
-      // Group completions by habit
-      const completionsByHabit = new Map<string, Set<number>>();
-      completionsData?.forEach((completion) => {
+      // Query habit_snapshots for historical dates in the month (excluding today)
+      const { data: snapshotsData, error: snapshotsError } = await supabase
+        .from('habit_snapshots')
+        .select('snapshot_date, habits_data')
+        .eq('user_id', user.id)
+        .gte('snapshot_date', formatPacificDateString(monthStart))
+        .lt('snapshot_date', today)
+        .lte('snapshot_date', formatPacificDateString(monthEnd));
+
+      if (snapshotsError) throw snapshotsError;
+
+      // Process today's completions
+      todayCompletions?.forEach((completion) => {
         const day = parseInt(completion.completion_date.split('-')[2]);
         if (!completionsByHabit.has(completion.habit_id)) {
           completionsByHabit.set(completion.habit_id, new Set());
         }
         completionsByHabit.get(completion.habit_id)?.add(day);
+      });
+
+      // Process historical snapshots
+      snapshotsData?.forEach((snapshot) => {
+        const day = parseInt(snapshot.snapshot_date.split('-')[2]);
+        const habitsArray = snapshot.habits_data as any[];
+        
+        habitsArray?.forEach((habitData) => {
+          if (habitData.completed && habitData.habit_id) {
+            if (!completionsByHabit.has(habitData.habit_id)) {
+              completionsByHabit.set(habitData.habit_id, new Set());
+            }
+            completionsByHabit.get(habitData.habit_id)?.add(day);
+          }
+        });
       });
 
       // Calculate statistics for each habit
