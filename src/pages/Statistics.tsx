@@ -31,21 +31,20 @@ const Statistics = () => {
     
     return (
       <div className="grid grid-cols-7 gap-2 mt-3">
-      {days.map((day) => (
-        <div key={day} className="p-0.5">
-          <div
-            className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium transition-all
-              ${completedDays.has(day)
-                ? `${habitColor} text-white`
-                : "bg-muted/30 text-muted-foreground"}
-              ring-1 ring-border/40 ring-offset-1 ring-offset-background`}
-          >
-            {day}
+        {days.map((day) => (
+          <div key={day} className="p-2">
+            <div
+              className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium transition-all
+                ${completedDays.has(day)
+                  ? `${habitColor} text-white`
+                  : "bg-muted/30 text-muted-foreground"}
+                ring-1 ring-border/40 ring-offset-1 ring-offset-background`}
+            >
+              {day}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-
+        ))}
+      </div>
     );
   };
 
