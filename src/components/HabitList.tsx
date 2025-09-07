@@ -23,9 +23,10 @@ interface HabitListProps {
   onPauseHabit: (id: string) => void;
   onActivateHabit: (id: string) => void;
   isVacationDate?: boolean;
+  isHistoricalDate?: boolean;
 }
 
-const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, onActivateHabit, isVacationDate = false }: HabitListProps) => {
+const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, onActivateHabit, isVacationDate = false, isHistoricalDate = false }: HabitListProps) => {
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
 
   const handleToggleHabit = (id: string) => {
@@ -100,39 +101,41 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, onActiv
                 )}
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-8 h-8 rounded-full hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center">
-                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  {habit.is_active ? (
+              {!isHistoricalDate && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-8 h-8 rounded-full hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center">
+                      <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    {habit.is_active ? (
+                      <DropdownMenuItem
+                        onClick={() => onPauseHabit(habit.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <Pause className="w-4 h-4" />
+                        Pause
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={() => onActivateHabit(habit.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <Play className="w-4 h-4" />
+                        Activate
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
-                      onClick={() => onPauseHabit(habit.id)}
-                      className="flex items-center gap-2"
+                      onClick={() => onDeleteHabit(habit.id)}
+                      className="flex items-center gap-2 text-destructive hover:text-destructive"
                     >
-                      <Pause className="w-4 h-4" />
-                      Pause
+                      <Trash2 className="w-4 h-4" />
+                      Delete
                     </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem
-                      onClick={() => onActivateHabit(habit.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <Play className="w-4 h-4" />
-                      Activate
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem
-                    onClick={() => onDeleteHabit(habit.id)}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>

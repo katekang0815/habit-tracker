@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useHabits } from "@/hooks/useHabits";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
+import { isPacificToday } from "@/lib/pacific-time";
 import type { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -131,6 +132,7 @@ const Index = () => {
             onPauseHabit={pauseHabit}
             onActivateHabit={activateHabit}
             isVacationDate={isDateInVacation(currentDate)}
+            isHistoricalDate={!isPacificToday(currentDate)}
           />
         )}
         </div>
