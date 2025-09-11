@@ -38,30 +38,42 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     }
 
     setLoading(true);
+    
+    // Create a unique request identifier to handle race conditions
+    const requestId = Date.now() + Math.random();
+    const currentSelectedDate = selectedDate; // Capture the current selectedDate
+    
     try {
       // For historical dates (not today), fetch from snapshots
-      if (!isPacificToday(selectedDate)) {
-        const snapshotHabits = await fetchSnapshot(selectedDate);
+      if (!isPacificToday(currentSelectedDate)) {
+        const snapshotHabits = await fetchSnapshot(currentSelectedDate);
         
-        if (snapshotHabits && snapshotHabits.length > 0) {
-          const habitsWithStatus = snapshotHabits.map((snapshot: SnapshotHabit) => ({
-            id: snapshot.habit_id,
-            name: snapshot.habit_name,
-            emoji: '', // Not stored in snapshots
-            is_active: snapshot.is_active,
-            completed: snapshot.completed,
-            can_toggle: false, // Historical data is read-only
-          }));
-          
-          setHabits(habitsWithStatus);
+        // Check if this is still the current request and date hasn't changed
+        if (currentSelectedDate.getTime() === selectedDate.getTime()) {
+          if (snapshotHabits && snapshotHabits.length > 0) {
+            const habitsWithStatus = snapshotHabits.map((snapshot: SnapshotHabit) => ({
+              id: snapshot.habit_id,
+              name: snapshot.habit_name,
+              emoji: '', // Not stored in snapshots
+              is_active: snapshot.is_active,
+              completed: snapshot.completed,
+              can_toggle: false, // Historical data is read-only
+            }));
+            
+            setHabits(habitsWithStatus);
+            setLoading(false);
+            return;
+          }
+        } else {
+          // Date changed while we were fetching, abort this request
           setLoading(false);
           return;
         }
       }
 
       // For today or when no snapshot exists, use dynamic data
-      const dateStr = formatPacificDateString(selectedDate); // for DATE comparisons
-      const nextPacificDayISO = getNextPacificDayStart(selectedDate).toISOString(); // for timestamptz
+      const dateStr = formatPacificDateString(currentSelectedDate); // for DATE comparisons
+      const nextPacificDayISO = getNextPacificDayStart(currentSelectedDate).toISOString(); // for timestamptz
 
       // Habits created on/before the selected LOCAL day (include both active and paused)
       const { data: habitsData, error: habitsError } = await supabase
@@ -73,8 +85,15 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       if (habitsError) throw habitsError;
 
+      // Check if date hasn't changed while we were fetching
+      if (currentSelectedDate.getTime() !== selectedDate.getTime()) {
+        setLoading(false);
+        return;
+      }
+
       if (!habitsData || habitsData.length === 0) {
         setHabits([]);
+        setLoading(false);
         return;
       }
 
@@ -87,6 +106,12 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       if (completionsError) throw completionsError;
 
+      // Final check if date hasn't changed
+      if (currentSelectedDate.getTime() !== selectedDate.getTime()) {
+        setLoading(false);
+        return;
+      }
+
       const completionsMap = new Map(
         (completionsData ?? []).map((c: HabitCompletion) => [c.habit_id, c.completed])
       );
@@ -94,7 +119,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const habitsWithStatus = habitsData.map((habit: Habit) => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: !isPacificFutureDate(selectedDate) && !isDateInVacation(selectedDate),
+        can_toggle: !isPacificFutureDate(currentSelectedDate) && !isDateInVacation(currentSelectedDate),
       }));
 
       setHabits(habitsWithStatus);
