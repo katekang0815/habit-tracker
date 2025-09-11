@@ -300,9 +300,11 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     }
   };
 
-  useEffect(() => {
-    fetchHabits();
-  }, [user, selectedDate]);
+ useEffect(() => {
+  // Clear habits immediately when date changes
+  setHabits([]);
+  fetchHabits();
+}, [user, selectedDate]);
 
   return {
     habits,
