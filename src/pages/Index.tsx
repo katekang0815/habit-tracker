@@ -126,6 +126,7 @@ const Index = () => {
           </div>
         ) : (
           <HabitList 
+            key={currentDate.toISOString()}
             habits={habits} 
             onToggleHabit={toggleHabit}
             onDeleteHabit={deleteHabit}
