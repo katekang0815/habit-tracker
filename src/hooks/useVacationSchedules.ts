@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { formatPacificDateString } from "@/lib/pacific-time";
 
 interface VacationSchedule {
   id: string;
@@ -156,7 +157,7 @@ export const useVacationSchedules = () => {
   const isDateInVacation = (date: Date): boolean => {
     if (!vacationSchedules.data) return false;
 
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = formatPacificDateString(date);
     
     return vacationSchedules.data.some(schedule => 
       dateString >= schedule.start_date && dateString <= schedule.end_date

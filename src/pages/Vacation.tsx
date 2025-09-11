@@ -15,6 +15,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { formatPacificDateString } from "@/lib/pacific-time";
 
 const Vacation = () => {
   const { user } = useAuth();
@@ -56,8 +57,8 @@ const Vacation = () => {
 
     try {
       await addVacationSchedule.mutateAsync({
-        start_date: format(startDate, "yyyy-MM-dd"),
-        end_date: format(endDate, "yyyy-MM-dd"),
+        start_date: formatPacificDateString(startDate),
+        end_date: formatPacificDateString(endDate),
       });
 
       setScheduledVacation({ start: startDate, end: endDate });
@@ -99,8 +100,8 @@ const Vacation = () => {
     try {
       await updateVacationSchedule.mutateAsync({
         id: scheduledVacation.id,
-        start_date: format(scheduledVacation.start, "yyyy-MM-dd"),
-        end_date: format(scheduledVacation.end, "yyyy-MM-dd"),
+        start_date: formatPacificDateString(scheduledVacation.start),
+        end_date: formatPacificDateString(scheduledVacation.end),
       });
       setHasChanges(false);
     } catch (error) {
