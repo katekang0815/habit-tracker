@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useHabits } from "@/hooks/useHabits";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import { isPacificToday } from "@/lib/pacific-time";
+import { debounce } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -22,6 +23,12 @@ const Index = () => {
   
   const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
+
+  // Debounced date change to prevent rapid requests
+  const debouncedDateChange = useMemo(
+    () => debounce((date: Date) => setCurrentDate(date), 300),
+    []
+  );
 
   useEffect(() => {
     // Set up auth state listener
@@ -99,7 +106,7 @@ const Index = () => {
           </div>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={setCurrentDate} />
+        <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
       </div>
 
       {/* Main Content */}
