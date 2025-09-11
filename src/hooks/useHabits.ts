@@ -303,6 +303,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
  useEffect(() => {
     // Clear habits immediately when date changes
     setHabits([]);
+    setLoading(true); // Make sure loading is set immediately
     fetchHabits();
   }, [user, selectedDate]);
 
