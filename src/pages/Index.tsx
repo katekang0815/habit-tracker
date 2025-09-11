@@ -5,6 +5,7 @@ import { HabitList } from "@/components/HabitList";
 import { AddHabitDialog } from "@/components/AddHabitDialog";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -103,7 +104,20 @@ const Index = () => {
 
       {/* Main Content */}
       <div className="flex-1 px-4 pb-24">
-        {habits.length === 0 ? (
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex items-center gap-3 p-4 bg-card rounded-xl border">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="w-12 h-8 rounded-full" />
+              </div>
+            ))}
+          </div>
+        ) : habits.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <span className="text-2xl">🌱</span>
