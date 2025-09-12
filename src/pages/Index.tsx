@@ -91,7 +91,7 @@ const Index = () => {
   };
 
   const completedToday = habits.filter(habit => habit.completed).length;
-  const streakCount = 7; // Mock streak counter
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
