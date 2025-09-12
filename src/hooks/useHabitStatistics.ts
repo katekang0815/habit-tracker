@@ -31,6 +31,12 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
       const monthEnd = endOfMonth(pacificDate);
       const daysInMonth = getDaysInMonth(pacificDate);
 
+      // Check if the selected month is the current month
+      const today = new Date();
+      const currentPacificDate = toPacificDate(today);
+      const isCurrentMonth = pacificDate.getFullYear() === currentPacificDate.getFullYear() && 
+                           pacificDate.getMonth() === currentPacificDate.getMonth();
+
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
         .from('habits')
@@ -47,35 +53,38 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         return;
       }
 
-      // Get today's date in Pacific time
-      const today = formatPacificDateString(new Date());
-      
       // Initialize completion map
       const completionsByHabit = new Map<string, Set<number>>();
 
-      // Query habit_completions for today's date only
-      const { data: todayCompletions, error: todayError } = await supabase
-        .from('habit_completions')
-        .select('habit_id, completion_date, completed')
-        .eq('user_id', user.id)
-        .eq('completion_date', today)
-        .eq('completed', true);
+      // Only fetch current month's habit_completions if viewing current month
+      let currentMonthCompletions: any[] = [];
+      if (isCurrentMonth) {
+        const { data: monthCompletions, error: monthError } = await supabase
+          .from('habit_completions')
+          .select('habit_id, completion_date, completed')
+          .eq('user_id', user.id)
+          .gte('completion_date', formatPacificDateString(monthStart))
+          .lte('completion_date', formatPacificDateString(monthEnd))
+          .eq('completed', true);
 
-      if (todayError) throw todayError;
+        if (monthError) throw monthError;
+        currentMonthCompletions = monthCompletions || [];
+      }
 
-      // Query habit_snapshots for historical dates in the month (excluding today)
+      // Query habit_snapshots for the selected month
+      const snapshotEndDate = isCurrentMonth ? formatPacificDateString(currentPacificDate) : formatPacificDateString(monthEnd);
       const { data: snapshotsData, error: snapshotsError } = await supabase
         .from('habit_snapshots')
         .select('snapshot_date, habits_data')
         .eq('user_id', user.id)
         .gte('snapshot_date', formatPacificDateString(monthStart))
-        .lt('snapshot_date', today)
+        .lt('snapshot_date', snapshotEndDate)
         .lte('snapshot_date', formatPacificDateString(monthEnd));
 
       if (snapshotsError) throw snapshotsError;
 
-      // Process today's completions
-      todayCompletions?.forEach((completion) => {
+      // Process current month's completions (only for current month)
+      currentMonthCompletions.forEach((completion) => {
         const day = parseInt(completion.completion_date.split('-')[2]);
         if (!completionsByHabit.has(completion.habit_id)) {
           completionsByHabit.set(completion.habit_id, new Set());
