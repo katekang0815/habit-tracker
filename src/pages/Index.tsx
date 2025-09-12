@@ -100,10 +100,6 @@ const Index = () => {
         <div className="px-4 pt-8 pb-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
-          <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
-            <Flame className="w-4 h-4 text-streak-flame" />
-            <span className="text-sm font-semibold text-foreground">{streakCount}</span>
-          </div>
         </div>
         
         <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
