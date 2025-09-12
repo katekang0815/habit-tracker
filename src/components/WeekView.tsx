@@ -38,11 +38,11 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   };
 
   const goToNextWeek = () => {
-    const nextWeek = addWeeks(currentDate, 1);
-    // Reset selection and mark as navigated week
-    setSelectedDate(null);
+    const nextWeekSunday = startOfWeek(addWeeks(currentDate, 1), { weekStartsOn: 0 });
+    
+    setSelectedDate(nextWeekSunday);
     setIsNavigatedWeek(true);
-    onDateChange(nextWeek);
+    onDateChange(nextWeekSunday);
   };
 
   const handleDateClick = (date: Date) => {
