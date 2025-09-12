@@ -1,5 +1,24 @@
 import { useState } from "react";
-import { Check, StarHalf, Sparkles, MoreVertical, Trash2, Pause, Play } from "lucide-react";
+import { Check, StarHalf, Sparkles, MoreVertical, Trash2, Pause, Play, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +33,7 @@ interface Habit {
   is_active: boolean;
   completed?: boolean;
   can_toggle?: boolean;
+  order_index?: number;
 }
 
 interface HabitListProps {
@@ -22,12 +42,180 @@ interface HabitListProps {
   onDeleteHabit: (id: string) => void;
   onPauseHabit: (id: string) => void;
   onActivateHabit: (id: string) => void;
+  onReorderHabits: (habitIds: string[]) => void;
   isVacationDate?: boolean;
   isHistoricalDate?: boolean;
+  canReorder?: boolean;
 }
 
-const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, onActivateHabit, isVacationDate = false, isHistoricalDate = false }: HabitListProps) => {
+// Sortable habit item component
+interface SortableHabitItemProps {
+  habit: Habit;
+  index: number;
+  animatingHabits: Set<string>;
+  onToggleHabit: (id: string) => void;
+  onDeleteHabit: (id: string) => void;
+  onPauseHabit: (id: string) => void;
+  onActivateHabit: (id: string) => void;
+  isVacationDate: boolean;
+  isHistoricalDate: boolean;
+  canReorder: boolean;
+}
+
+const SortableHabitItem = ({ 
+  habit, 
+  index, 
+  animatingHabits, 
+  onToggleHabit, 
+  onDeleteHabit, 
+  onPauseHabit, 
+  onActivateHabit, 
+  isVacationDate, 
+  isHistoricalDate,
+  canReorder 
+}: SortableHabitItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const handleToggleHabit = (id: string) => {
+    const currentHabit = habit;
+    
+    // Don't allow toggling if habit can't be toggled (not today or future date)
+    if (!currentHabit?.can_toggle) return;
+    
+    onToggleHabit(id);
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
+        !habit.can_toggle ? 'opacity-50' : ''
+      } ${isVacationDate ? 'opacity-70' : ''} ${!habit.is_active ? 'opacity-40 grayscale' : ''} ${
+        isDragging ? 'opacity-50 scale-105 z-50' : ''
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        {canReorder && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="p-1 hover:bg-muted/50 rounded transition-colors duration-200 cursor-grab active:cursor-grabbing"
+          >
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+        
+        <span className="text-lg font-medium text-muted-foreground">
+          {index + 1}
+        </span>
+        
+        <div className="flex items-center gap-3 flex-1">
+          {habit.emoji && (
+            <span className="text-xl">{habit.emoji}</span>
+          )}
+          <span className={`font-medium transition-all duration-300 text-foreground ${
+            isVacationDate ? 'line-through text-muted-foreground' : ''
+          } ${!habit.is_active ? 'text-muted-foreground' : ''}`}>
+            {habit.name}
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              onClick={() => handleToggleHabit(habit.id)}
+              disabled={!habit.can_toggle}
+              className={`w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative ${
+                !habit.can_toggle ? 'cursor-not-allowed opacity-50' : ''
+              }`}
+            >
+              {habit.completed && (
+                <Check className={`w-4 h-4 text-habit-complete ${animatingHabits.has(habit.id) ? 'animate-spark' : ''}`} />
+              )}
+            </button>
+            
+            {/* Sparkles animation */}
+            {animatingHabits.has(habit.id) && (
+              <>
+                <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
+                <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
+                <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
+              </>
+            )}
+          </div>
+
+          {!isHistoricalDate && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-8 h-8 rounded-full hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center">
+                  <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                {habit.is_active ? (
+                  <DropdownMenuItem
+                    onClick={() => onPauseHabit(habit.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <Pause className="w-4 h-4" />
+                    Pause
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => onActivateHabit(habit.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Activate
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onClick={() => onDeleteHabit(habit.id)}
+                  className="flex items-center gap-2 text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HabitList = ({ 
+  habits, 
+  onToggleHabit, 
+  onDeleteHabit, 
+  onPauseHabit, 
+  onActivateHabit, 
+  onReorderHabits, 
+  isVacationDate = false, 
+  isHistoricalDate = false,
+  canReorder = false 
+}: HabitListProps) => {
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleToggleHabit = (id: string) => {
     const habit = habits.find(h => h.id === id);
@@ -52,95 +240,67 @@ const HabitList = ({ habits, onToggleHabit, onDeleteHabit, onPauseHabit, onActiv
     onToggleHabit(id);
   };
 
-  return (
-    <div className="space-y-3">
-      {habits.map((habit, index) => (
-        <div
-          key={habit.id}
-          className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
-            !habit.can_toggle ? 'opacity-50' : ''
-          } ${isVacationDate ? 'opacity-70' : ''} ${!habit.is_active ? 'opacity-40 grayscale' : ''}`}
-        >
-          <div className="flex items-center gap-4">
-            <span className="text-lg font-medium text-muted-foreground">
-              {index + 1}
-            </span>
-            
-            <div className="flex items-center gap-3 flex-1">
-              {habit.emoji && (
-                <span className="text-xl">{habit.emoji}</span>
-              )}
-              <span className={`font-medium transition-all duration-300 text-foreground ${
-                isVacationDate ? 'line-through text-muted-foreground' : ''
-              } ${!habit.is_active ? 'text-muted-foreground' : ''}`}>
-                {habit.name}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <button
-                  onClick={() => handleToggleHabit(habit.id)}
-                  disabled={!habit.can_toggle}
-                  className={`w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative ${
-                    !habit.can_toggle ? 'cursor-not-allowed opacity-50' : ''
-                  }`}
-                >
-                  {habit.completed && (
-                    <Check className={`w-4 h-4 text-habit-complete ${animatingHabits.has(habit.id) ? 'animate-spark' : ''}`} />
-                  )}
-                </button>
-                
-                {/* Sparkles animation */}
-                {animatingHabits.has(habit.id) && (
-                  <>
-                    <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
-                    <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
-                    <Sparkles className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
-                  </>
-                )}
-              </div>
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
 
-              {!isHistoricalDate && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="w-8 h-8 rounded-full hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center">
-                      <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    {habit.is_active ? (
-                      <DropdownMenuItem
-                        onClick={() => onPauseHabit(habit.id)}
-                        className="flex items-center gap-2"
-                      >
-                        <Pause className="w-4 h-4" />
-                        Pause
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem
-                        onClick={() => onActivateHabit(habit.id)}
-                        className="flex items-center gap-2"
-                      >
-                        <Play className="w-4 h-4" />
-                        Activate
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      onClick={() => onDeleteHabit(habit.id)}
-                      className="flex items-center gap-2 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
+    if (active.id !== over?.id) {
+      const oldIndex = habits.findIndex(habit => habit.id === active.id);
+      const newIndex = habits.findIndex(habit => habit.id === over?.id);
+      
+      const newOrder = arrayMove(habits, oldIndex, newIndex);
+      onReorderHabits(newOrder.map(habit => habit.id));
+    }
+  }
+
+  if (!canReorder) {
+    // Non-draggable version for historical/vacation dates
+    return (
+      <div className="space-y-3">
+        {habits.map((habit, index) => (
+          <SortableHabitItem
+            key={habit.id}
+            habit={habit}
+            index={index}
+            animatingHabits={animatingHabits}
+            onToggleHabit={handleToggleHabit}
+            onDeleteHabit={onDeleteHabit}
+            onPauseHabit={onPauseHabit}
+            onActivateHabit={onActivateHabit}
+            isVacationDate={isVacationDate}
+            isHistoricalDate={isHistoricalDate}
+            canReorder={false}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-3">
+          {habits.map((habit, index) => (
+            <SortableHabitItem
+              key={habit.id}
+              habit={habit}
+              index={index}
+              animatingHabits={animatingHabits}
+              onToggleHabit={handleToggleHabit}
+              onDeleteHabit={onDeleteHabit}
+              onPauseHabit={onPauseHabit}
+              onActivateHabit={onActivateHabit}
+              isVacationDate={isVacationDate}
+              isHistoricalDate={isHistoricalDate}
+              canReorder={canReorder}
+            />
+          ))}
         </div>
-      ))}
-    </div>
+      </SortableContext>
+    </DndContext>
   );
 };
 

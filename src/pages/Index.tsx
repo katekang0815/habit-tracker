@@ -21,7 +21,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   
-  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit } = useHabits(user, currentDate);
+  const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit, reorderHabits } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
 
   // Debounced date change to prevent rapid requests
@@ -149,8 +149,10 @@ const Index = () => {
             onDeleteHabit={deleteHabit}
             onPauseHabit={pauseHabit}
             onActivateHabit={activateHabit}
+            onReorderHabits={reorderHabits}
             isVacationDate={isDateInVacation(currentDate)}
             isHistoricalDate={!isPacificToday(currentDate)}
+            canReorder={isPacificToday(currentDate) && !isDateInVacation(currentDate)}
           />
         )}
         </div>

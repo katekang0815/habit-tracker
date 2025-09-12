@@ -13,6 +13,7 @@ export interface Habit {
   is_active: boolean;
   completed?: boolean;
   can_toggle?: boolean;
+  order_index?: number;
 }
 
 export interface HabitCompletion {
@@ -81,7 +82,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         .select("*")
         .eq("user_id", user.id)
         .lt("created_at", nextPacificDayISO) // strictly before next day's Pacific midnight
-        .order("created_at", { ascending: true });
+        .order("order_index", { ascending: true });
 
       if (habitsError) throw habitsError;
 
@@ -139,9 +140,19 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     if (!user) return;
 
     try {
+      // Get the next order_index for this user
+      const { data: maxOrderData } = await supabase
+        .from("habits")
+        .select("order_index")
+        .eq("user_id", user.id)
+        .order("order_index", { ascending: false })
+        .limit(1);
+
+      const nextOrder = (maxOrderData?.[0]?.order_index || 0) + 1;
+
       const { error } = await supabase
         .from("habits")
-        .insert([{ user_id: user.id, name, emoji }]);
+        .insert([{ user_id: user.id, name, emoji, order_index: nextOrder }]);
 
       if (error) throw error;
 
@@ -307,6 +318,47 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     fetchHabits();
   }, [user, selectedDate]);
 
+  const reorderHabits = async (habitIds: string[]) => {
+    if (!user) return;
+
+    try {
+      // Create batch updates for all habits with new order indices
+      const updates = habitIds.map((habitId, index) => ({
+        id: habitId,
+        user_id: user.id,
+        order_index: index + 1
+      }));
+
+      // Optimistically update UI
+      const newHabits = [...habits].sort((a, b) => {
+        const aIndex = habitIds.indexOf(a.id);
+        const bIndex = habitIds.indexOf(b.id);
+        return aIndex - bIndex;
+      });
+      setHabits(newHabits);
+
+      // Update database
+      for (const update of updates) {
+        const { error } = await supabase
+          .from("habits")
+          .update({ order_index: update.order_index })
+          .eq("id", update.id)
+          .eq("user_id", user.id);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error("Error reordering habits:", error);
+      // Revert on error
+      fetchHabits();
+      toast({
+        title: "Error",
+        description: "Failed to reorder habits",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     habits,
     loading,
@@ -315,6 +367,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     deleteHabit,
     pauseHabit,
     activateHabit,
+    reorderHabits,
     refetch: fetchHabits,
     runMigration, // Expose migration function
   };

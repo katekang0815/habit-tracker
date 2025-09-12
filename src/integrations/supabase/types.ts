@@ -83,6 +83,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          order_index: number
           updated_at: string
           user_id: string
         }
@@ -92,6 +93,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          order_index?: number
           updated_at?: string
           user_id: string
         }
@@ -101,6 +103,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          order_index?: number
           updated_at?: string
           user_id?: string
         }
