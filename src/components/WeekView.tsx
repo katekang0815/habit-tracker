@@ -29,11 +29,12 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   });
 
   const goToPreviousWeek = () => {
-    const previousWeek = subWeeks(currentDate, 1);
-    // Reset selection and mark as navigated week
-    setSelectedDate(null);
+    const previousWeekStart = subWeeks(currentDate, 1);
+    const previousWeekSaturday = addDays(startOfWeek(previousWeekStart, { weekStartsOn: 0 }), 6);
+    
+    setSelectedDate(previousWeekSaturday);
     setIsNavigatedWeek(true);
-    onDateChange(previousWeek);
+    onDateChange(previousWeekSaturday);
   };
 
   const goToNextWeek = () => {
