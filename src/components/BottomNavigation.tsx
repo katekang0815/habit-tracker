@@ -21,7 +21,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     { icon: BarChart3, label: "Stats", path: "/statistics" },
     { icon: Users, label: "Social" },
     { icon: Pause, label: "Break", path: "/vacation" },
-    { icon: User, label: "Profile" },
+    { icon: User, label: "Profile", path: "/profile" },
   ];
 
   return (
@@ -52,7 +52,12 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                 onMouseLeave={() => setShowSignOut(false)}
               >
                 <button
-                  className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground"
+                  onClick={() => navigate("/profile")}
+                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    location.pathname === "/profile"
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="text-xs font-medium">{item.label}</span>
