@@ -52,6 +52,15 @@ export function isPacificFutureDate(date: Date): boolean {
 }
 
 /**
+ * Parse a date string (YYYY-MM-DD) as a Pacific timezone date
+ * This prevents timezone shifts when parsing database date strings
+ */
+export function parsePacificDateString(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/**
  * Get start of next day in Pacific timezone
  */
 export function getNextPacificDayStart(date: Date): Date {

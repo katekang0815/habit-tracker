@@ -15,7 +15,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { formatPacificDateString } from "@/lib/pacific-time";
+import { formatPacificDateString, parsePacificDateString } from "@/lib/pacific-time";
 
 const Vacation = () => {
   const { user } = useAuth();
@@ -118,8 +118,8 @@ const Vacation = () => {
     if (vacationSchedules.length > 0 && !scheduledVacation) {
       const latestSchedule = vacationSchedules[0]; // Get the first/latest schedule
       setScheduledVacation({
-        start: new Date(latestSchedule.start_date),
-        end: new Date(latestSchedule.end_date),
+        start: parsePacificDateString(latestSchedule.start_date),
+        end: parsePacificDateString(latestSchedule.end_date),
         id: latestSchedule.id
       });
     }
