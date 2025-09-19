@@ -13,7 +13,7 @@ const Profile = () => {
   // State for field values
   const [name, setName] = useState("Routiner");
   const [bio, setBio] = useState("");
-  const [instagram, setInstagram] = useState("");
+  const [linkedIn, setLinkedIn] = useState("");
 
   // Save handlers
   const handleSaveName = () => {
@@ -26,7 +26,7 @@ const Profile = () => {
     // Here you would typically save to backend
   };
 
-  const handleSaveInstagram = () => {
+  const handleSaveLinkedIn = () => {
     setIsEditingUrl(false);
     // Here you would typically save to backend
   };
@@ -132,18 +132,18 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Instagram/URL Field */}
+        {/* LinkedIn/URL Field */}
         <div className="mb-8">
           <label className="block text-sm font-medium text-muted-foreground mb-3">
-            Instagram
+            LinkedIn
           </label>
           <div className="relative">
             <Input
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
+              value={linkedIn}
+              onChange={(e) => setLinkedIn(e.target.value)}
               readOnly={!isEditingUrl}
               className={`pr-12 ${!isEditingUrl ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
-              placeholder="What's your Instagram handle?"
+              placeholder="What's your LinkedIn?"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
               {!isEditingUrl ? (
@@ -160,7 +160,7 @@ const Profile = () => {
                   size="icon"
                   variant="ghost"
                   className="w-8 h-8 text-muted-foreground hover:text-foreground"
-                  onClick={handleSaveInstagram}
+                  onClick={handleSaveLinkedIn}
                 >
                   <Save className="w-4 h-4" />
                 </Button>
