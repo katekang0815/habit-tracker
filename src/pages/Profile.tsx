@@ -1,39 +1,79 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const MAX_FILE_MB = 5;
 
 const Profile = () => {
-  // Initial values (replace with backend values later)
-  const initial = {
-    name: "Routiner",
-    bio: "",
-    linkedIn: "",
-    avatarUrl: "", // backend-provided URL if you have one
-  };
-
-  const [name, setName] = useState(initial.name);
-  const [bio, setBio] = useState(initial.bio);
-  const [linkedIn, setLinkedIn] = useState(initial.linkedIn);
-  const [avatarUrl, setAvatarUrl] = useState<string>(initial.avatarUrl);
-  const [previewUrl, setPreviewUrl] = useState<string>(""); // local preview URL
+  const { user } = useAuth();
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [linkedIn, setLinkedIn] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [initialData, setInitialData] = useState({ name: "", bio: "", linkedIn: "", avatarUrl: "" });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Load profile data on component mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('display_name, bio, linkedin, avatar_url')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+          return;
+        }
+
+        if (data) {
+          const profileData = {
+            name: data.display_name || "",
+            bio: data.bio || "",
+            linkedIn: data.linkedin || "",
+            avatarUrl: data.avatar_url || ""
+          };
+          
+          setName(profileData.name);
+          setBio(profileData.bio);
+          setLinkedIn(profileData.linkedIn);
+          setAvatarUrl(profileData.avatarUrl);
+          setInitialData(profileData);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
 
   // enable/disable Save button
   const isDirty = useMemo(() => {
     return (
-      name !== initial.name ||
-      bio !== initial.bio ||
-      linkedIn !== initial.linkedIn ||
+      name !== initialData.name ||
+      bio !== initialData.bio ||
+      linkedIn !== initialData.linkedIn ||
       // If a preview exists, user changed avatar locally
       !!previewUrl
     );
-  }, [name, bio, linkedIn, previewUrl]);
+  }, [name, bio, linkedIn, previewUrl, initialData]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -60,17 +100,50 @@ const Profile = () => {
     // (we keep avatarUrl for potential backend URL later)
   };
 
-  const handleSaveAll = () => {
-    // TODO: replace with real API call to upload avatar & save profile fields
-    // If uploading, you'd typically send the File, not the object URL.
-    // Here we’re just demonstrating the UI part:
-    // - avatar: previewUrl is what we’re showing locally.
-    // After your upload returns a CDN URL, setAvatarUrl(cdnUrl) and setPreviewUrl("")
-    console.log("Save profile", { name, bio, linkedIn, avatarPreview: previewUrl || avatarUrl });
+  const handleSaveAll = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          display_name: name,
+          bio: bio,
+          linkedin: linkedIn,
+          // TODO: Handle avatar upload later
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast.error('Failed to save profile');
+        console.error('Error saving profile:', error);
+        return;
+      }
+
+      // Update initial data to reflect saved state
+      const newInitialData = { name, bio, linkedIn, avatarUrl };
+      setInitialData(newInitialData);
+      setPreviewUrl(""); // Clear preview after save
+      toast.success('Profile saved successfully');
+    } catch (error) {
+      toast.error('Failed to save profile');
+      console.error('Error saving profile:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Current image source preference: show preview first, otherwise existing avatarUrl
   const currentAvatarSrc = previewUrl || avatarUrl || "";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -162,11 +235,11 @@ const Profile = () => {
         <div className="mt-6">
           <Button
             className="w-full"
-            disabled={!isDirty}
+            disabled={!isDirty || saving || loading}
             onClick={handleSaveAll}
             type="button"
           >
-            Save changes
+            {saving ? "Saving..." : "Save changes"}
           </Button>
         </div>
       </div>
