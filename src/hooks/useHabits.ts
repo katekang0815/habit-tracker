@@ -35,6 +35,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const fetchHabits = async () => {
     if (!user) {
       setHabits([]);
+      setLoading(false);
       return;
     }
 
