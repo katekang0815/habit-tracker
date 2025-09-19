@@ -1,6 +1,6 @@
 import { Home, Plus, BarChart3, Users, Pause, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
@@ -12,6 +12,7 @@ interface BottomNavigationProps {
 
 const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps) => {
   const [showSignOut, setShowSignOut] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout>();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -48,8 +49,17 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
               <div
                 key={item.label}
                 className="relative"
-                onMouseEnter={() => setShowSignOut(true)}
-                onMouseLeave={() => setShowSignOut(false)}
+                onMouseEnter={() => {
+                  if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                  }
+                  setShowSignOut(true);
+                }}
+                onMouseLeave={() => {
+                  timeoutRef.current = setTimeout(() => {
+                    setShowSignOut(false);
+                  }, 500);
+                }}
               >
                 <button
                   onClick={() => navigate("/profile")}
