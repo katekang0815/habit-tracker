@@ -17,6 +17,7 @@ const Profile = () => {
   const [linkedIn, setLinkedIn] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [initialData, setInitialData] = useState({ name: "", bio: "", linkedIn: "", avatarUrl: "" });
@@ -83,11 +84,11 @@ const Profile = () => {
 
     // Basic guards
     if (!file.type.startsWith("image/")) {
-      alert("Please choose an image file.");
+      toast.error("Please choose an image file.");
       return;
     }
     if (file.size > MAX_FILE_MB * 1024 * 1024) {
-      alert(`Image is too large. Max ${MAX_FILE_MB}MB.`);
+      toast.error(`Image is too large. Max ${MAX_FILE_MB}MB.`);
       return;
     }
 
@@ -96,8 +97,7 @@ const Profile = () => {
 
     const localUrl = URL.createObjectURL(file);
     setPreviewUrl(localUrl);
-    // If you want immediate UI swap, set avatar image to preview
-    // (we keep avatarUrl for potential backend URL later)
+    setSelectedFile(file);
   };
 
   const handleSaveAll = async () => {
@@ -105,13 +105,54 @@ const Profile = () => {
     
     setSaving(true);
     try {
+      let newAvatarUrl = avatarUrl;
+
+      // Step 1: Upload new avatar if one was selected
+      if (selectedFile) {
+        // Generate unique filename
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+        
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, selectedFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          toast.error('Failed to upload avatar');
+          console.error('Upload error:', uploadError);
+          return;
+        }
+
+        // Get public URL for the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(uploadData.path);
+
+        newAvatarUrl = publicUrl;
+
+        // Step 4: Delete old avatar file if it exists
+        if (avatarUrl && avatarUrl.includes('supabase.co/storage')) {
+          const oldPath = avatarUrl.split('/storage/v1/object/public/avatars/')[1];
+          if (oldPath) {
+            await supabase.storage
+              .from('avatars')
+              .remove([oldPath]);
+          }
+        }
+      }
+
+      // Step 2 & 3: Update profile with new data including avatar URL
       const { error } = await supabase
         .from('profiles')
         .update({
           display_name: name,
           bio: bio,
           linkedin: linkedIn,
-          // TODO: Handle avatar upload later
+          avatar_url: newAvatarUrl,
         })
         .eq('user_id', user.id);
 
@@ -121,10 +162,18 @@ const Profile = () => {
         return;
       }
 
-      // Update initial data to reflect saved state
-      const newInitialData = { name, bio, linkedIn, avatarUrl };
+      // Step 5: Clear preview state and update initial data
+      setAvatarUrl(newAvatarUrl);
+      const newInitialData = { name, bio, linkedIn, avatarUrl: newAvatarUrl };
       setInitialData(newInitialData);
-      setPreviewUrl(""); // Clear preview after save
+      setPreviewUrl("");
+      setSelectedFile(null);
+      
+      // Clear file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
       toast.success('Profile saved successfully');
     } catch (error) {
       toast.error('Failed to save profile');
