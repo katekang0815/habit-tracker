@@ -290,7 +290,7 @@ const Profile = () => {
             <Input
               value={linkedIn}
               onChange={(e) => setLinkedIn(e.target.value)}
-              placeholder="share your notion workspace url"
+              placeholder="share your Notion workspace URL"
               inputMode="url"
               className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
             />
