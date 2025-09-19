@@ -183,18 +183,18 @@ const Vacation = () => {
           </div>
         </div>
 
-        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-6">
-          <CardContent className="p-6">
+        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-10">
+          <CardContent className="p-4">
             {scheduledVacation ? (
               <>
-                <div className="text-center mb-6 p-6">
+                <div className="text-center mb-6">
                   <h2 className="text-xl font-semibold text-foreground mb-2">Your vacation is scheduled 🌿</h2>
                   <p className="text-muted-foreground text-sm">
                     Tap the date below to edit the period.
                   </p>
                 </div>
 
-                <div className="space-y-6 text-medium">
+                <div className="space-y-6">
                   <div className="flex items-center justify-center gap-4">
                     {/* From Date */}
                     <div className="flex flex-col items-center">
