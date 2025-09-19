@@ -9,6 +9,27 @@ const Profile = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isEditingUrl, setIsEditingUrl] = useState(false);
+  
+  // State for field values
+  const [name, setName] = useState("Routiner");
+  const [bio, setBio] = useState("");
+  const [instagram, setInstagram] = useState("");
+
+  // Save handlers
+  const handleSaveName = () => {
+    setIsEditingName(false);
+    // Here you would typically save to backend
+  };
+
+  const handleSaveBio = () => {
+    setIsEditingBio(false);
+    // Here you would typically save to backend
+  };
+
+  const handleSaveInstagram = () => {
+    setIsEditingUrl(false);
+    // Here you would typically save to backend
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,7 +45,7 @@ const Profile = () => {
             <Avatar className="w-24 h-24">
               <AvatarImage src="" alt="Profile" />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-medium">
-                R
+                {name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <Button
@@ -44,27 +65,32 @@ const Profile = () => {
           </label>
           <div className="relative">
             <Input
-              value="Routiner"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               readOnly={!isEditingName}
-              className={`pr-20 ${!isEditingName ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
+              className={`pr-12 ${!isEditingName ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
               placeholder="Enter your name"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsEditingName(!isEditingName)}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-              >
-                <Save className="w-4 h-4" />
-              </Button>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              {!isEditingName ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsEditingName(true)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={handleSaveName}
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -76,26 +102,32 @@ const Profile = () => {
           </label>
           <div className="relative">
             <Textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
               readOnly={!isEditingBio}
-              className={`min-h-[100px] pr-20 resize-none ${!isEditingBio ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
+              className={`min-h-[100px] pr-12 resize-none ${!isEditingBio ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
               placeholder="how would you describe yourself?"
             />
-            <div className="absolute right-2 top-3 flex gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsEditingBio(!isEditingBio)}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-              >
-                <Save className="w-4 h-4" />
-              </Button>
+            <div className="absolute right-2 top-3">
+              {!isEditingBio ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsEditingBio(true)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={handleSaveBio}
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -107,26 +139,32 @@ const Profile = () => {
           </label>
           <div className="relative">
             <Input
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
               readOnly={!isEditingUrl}
-              className={`pr-20 ${!isEditingUrl ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
+              className={`pr-12 ${!isEditingUrl ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
               placeholder="What's your Instagram handle?"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsEditingUrl(!isEditingUrl)}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-8 h-8 text-muted-foreground hover:text-foreground"
-              >
-                <Save className="w-4 h-4" />
-              </Button>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              {!isEditingUrl ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsEditingUrl(true)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-8 h-8 text-muted-foreground hover:text-foreground"
+                  onClick={handleSaveInstagram}
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
