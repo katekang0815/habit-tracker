@@ -174,7 +174,7 @@ const Vacation = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-6 max-w-md mx-auto pt-8 pr-4 pl-4">
+      <div className="relative z-10 p-16 max-w-md mx-auto pt-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Go on Vacation</h1>
           <div className="space-y-1">
@@ -183,7 +183,7 @@ const Vacation = () => {
           </div>
         </div>
 
-        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-4">
+        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-14">
           <CardContent className="p-4">
             {scheduledVacation ? (
               <>
@@ -234,7 +234,7 @@ const Vacation = () => {
                         <PopoverTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
+                            className="text-medium font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
                           >
                             {format(scheduledVacation.end, "MMMM d, yyyy")}
                           </Button>
