@@ -7,6 +7,7 @@ import { Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { BottomNavigation } from "@/components/BottomNavigation";
 
 const MAX_FILE_MB = 5;
 
@@ -183,6 +184,22 @@ const Profile = () => {
     }
   };
 
+  // Handlers for BottomNavigation
+  const handleAddClick = () => {
+    // You can implement add functionality here if needed
+    console.log("Add clicked from profile");
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("Failed to sign out");
+      console.error("Sign out error:", error);
+    }
+  };
+
   // Current image source preference: show preview first, otherwise existing avatarUrl
   const currentAvatarSrc = previewUrl || avatarUrl || "";
 
@@ -195,7 +212,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-8 max-w-md">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-center mb-12 text-foreground">
@@ -281,7 +298,7 @@ const Profile = () => {
         </div>
 
         {/* Save Button */}
-        <div className="mt-6">
+        <div className="mt-6 mb-8">
           <Button
             className="w-full"
             disabled={!isDirty || saving || loading}
@@ -292,6 +309,12 @@ const Profile = () => {
           </Button>
         </div>
       </div>
+
+      <BottomNavigation 
+        onAddClick={handleAddClick}
+        user={user}
+        onSignOut={handleSignOut}
+      />
     </div>
   );
 };
