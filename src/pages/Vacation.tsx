@@ -202,7 +202,7 @@ const Vacation = () => {
                         <PopoverTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent pl-2 pr-2 py-1"
+                            className="text-base font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent pl-2 pr-2 py-1"
                           >
                             {format(scheduledVacation.start, "MMMM d, yyyy")}
                           </Button>
@@ -234,7 +234,7 @@ const Vacation = () => {
                         <PopoverTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent pl-2 pr-2 py-1"
+                            className="text-base  font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent pl-2 pr-2 py-1"
                           >
                             {format(scheduledVacation.end, "MMMM d, yyyy")}
                           </Button>
