@@ -174,7 +174,7 @@ const Vacation = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-16 max-w-md mx-auto pt-8">
+      <div className="relative z-10 p-6 max-w-md mx-auto pt-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Go on Vacation</h1>
           <div className="space-y-1">
@@ -183,8 +183,8 @@ const Vacation = () => {
           </div>
         </div>
 
-        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-14">
-          <CardContent className="p-4">
+        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8">
+          <CardContent className="p-16">
             {scheduledVacation ? (
               <>
                 <div className="text-center mb-6">
