@@ -187,7 +187,7 @@ const Vacation = () => {
           <CardContent className="p-6">
             {scheduledVacation ? (
               <>
-                <div className="text-center mb-6">
+                <div className="text-center mb-6 p-6">
                   <h2 className="text-xl font-semibold text-foreground mb-2">Your vacation is scheduled 🌿</h2>
                   <p className="text-muted-foreground text-sm">
                     Tap the date below to edit the period.
