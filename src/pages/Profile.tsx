@@ -285,12 +285,12 @@ const Profile = () => {
           {/* LinkedIn */}
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-3">
-              LinkedIn
+              Notion Workspace
             </label>
             <Input
               value={linkedIn}
               onChange={(e) => setLinkedIn(e.target.value)}
-              placeholder="https://www.linkedin.com/in/you"
+              placeholder="share your notion workspace url"
               inputMode="url"
               className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
             />
