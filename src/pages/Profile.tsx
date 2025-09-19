@@ -59,7 +59,7 @@ const Profile = () => {
         </div>
 
         {/* Fields Container */}
-        <div className="space-y-8 rounded-xl border border-gray-300 bg-background p-5">
+        <div className="space-y-8 rounded-xl border border-gray-300 bg-background p-10">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-3">
@@ -69,7 +69,7 @@ const Profile = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
-              className="border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
+              className="p-2 border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
             />
           </div>
 
@@ -81,7 +81,7 @@ const Profile = () => {
             <Textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="min-h-[100px] resize-none border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
+              className="p-2 min-h-[100px] resize-none border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
               placeholder="How would you describe yourself?"
             />
           </div>
@@ -96,7 +96,7 @@ const Profile = () => {
               onChange={(e) => setLinkedIn(e.target.value)}
               placeholder="https://www.linkedin.com/in/you"
               inputMode="url"
-              className="border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
+              className="p-2 border border-gray-300 hover:border-green-500 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
             />
           </div>
         </div>
