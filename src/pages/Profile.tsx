@@ -105,7 +105,7 @@ const Profile = () => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               readOnly={!isEditingBio}
-              className={`min-h-[100px] pr-12 resize-none ${!isEditingBio ? 'border-none bg-transparent focus-visible:ring-0' : ''}`}
+              className={`min-h-[100px] pr-12 resize-none ${!isEditingBio ? 'border border-gray-300 bg-slate-100 focus-visible:ring-0' : ''}`}
               placeholder="how would you describe yourself?"
             />
             <div className="absolute right-2 top-3">
