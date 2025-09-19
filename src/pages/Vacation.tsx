@@ -234,7 +234,7 @@ const Vacation = () => {
                         <PopoverTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="text-medium font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
+                            className="text-lg font-medium text-foreground border-b-2 border-primary bg-transparent rounded-none hover:bg-transparent px-2 py-1"
                           >
                             {format(scheduledVacation.end, "MMMM d, yyyy")}
                           </Button>
