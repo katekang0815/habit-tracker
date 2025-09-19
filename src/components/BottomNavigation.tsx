@@ -74,7 +74,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                 </button>
                 
                 {showSignOut && (
-                  <div className="absolute bottom-full right-1 mb-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-max">
+                  <div className="absolute bottom-full right-4 mb-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-max">
                     <Button
                       variant="ghost"
                       size="sm"
