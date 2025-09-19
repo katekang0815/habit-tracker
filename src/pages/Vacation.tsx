@@ -194,8 +194,8 @@ const Vacation = () => {
                   </p>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="flex items-center justify-center gap-4 p-6">
+                <div className="space-y-6 p-6">
+                  <div className="flex items-center justify-center gap-4">
                     {/* From Date */}
                     <div className="flex flex-col items-center">
                       <Popover open={showStartCalendar} onOpenChange={setShowStartCalendar}>
