@@ -174,7 +174,7 @@ const Vacation = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-6 max-w-md mx-auto pt-8">
+      <div className="relative z-10 p-6 max-w-md mx-auto pt-8 pr-4 pl-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Go on Vacation</h1>
           <div className="space-y-1">
