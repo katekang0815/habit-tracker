@@ -183,7 +183,7 @@ const Vacation = () => {
           </div>
         </div>
 
-        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-10 mx-2">
+        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg mb-8 p-10 px-6">
           <CardContent className="p-4">
             {scheduledVacation ? (
               <>
