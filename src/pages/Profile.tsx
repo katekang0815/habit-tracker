@@ -216,7 +216,7 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-8 max-w-md">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-center mb-12 text-foreground">
-          profile
+          Profile
         </h1>
 
         {/* Profile Image */}
