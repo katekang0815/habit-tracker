@@ -98,7 +98,7 @@ const Index = () => {
       <div className="max-w-xl mx-auto">
         {/* Header */}
         <div className="px-4 pt-8 pb-4">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-10">
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
         </div>
         
@@ -106,7 +106,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 px-4 pb-24">
+      <div className="flex-1 px-4 pb-24 mb-10">
         {loading ? (
           <div className="space-y-3">
             {[...Array(4)].map((_, index) => (
