@@ -2,6 +2,7 @@ import { Home, Plus, BarChart3, Users, Pause, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface BottomNavigationProps {
@@ -15,6 +16,21 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
   const timeoutRef = useRef<NodeJS.Timeout>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
+  
+  const handleNavigationClick = (item: any) => {
+    if (item.label === "Break" && !user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to schedule a vacation",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (item.path) {
+      navigate(item.path);
+    }
+  };
   
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -93,7 +109,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
           return (
             <button
               key={item.label}
-              onClick={() => item.path && navigate(item.path)}
+              onClick={() => handleNavigationClick(item)}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
                 location.pathname === item.path
                   ? "text-primary"
