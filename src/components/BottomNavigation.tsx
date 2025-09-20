@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { toast } from "@/hooks/use-toast";
 
 interface BottomNavigationProps {
   onAddClick: () => void;
@@ -15,6 +16,16 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
   const timeoutRef = useRef<NodeJS.Timeout>();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const handleStatsClick = () => {
+    if (user) {
+      navigate("/statistics");
+    } else {
+      toast({
+        description: "Please sign in to view your habit statistics"
+      });
+    }
+  };
   
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -41,6 +52,23 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
               >
                 <Icon className="w-5 h-5" />
               </Button>
+            );
+          }
+          
+          if (item.label === "Stats") {
+            return (
+              <button
+                key={item.label}
+                onClick={handleStatsClick}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  location.pathname === "/statistics"
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </button>
             );
           }
           
