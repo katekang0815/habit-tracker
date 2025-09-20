@@ -114,7 +114,7 @@ const Statistics = () => {
             </div>
           ) : (
             habitStats.map((stat, index) => (
-              <Card key={stat.habitId} className="p-3 bg-card/50 backdrop-blur-sm border-border/50">
+              <Card key={stat.habitId} className="p-3 pr-4 bg-card/50 backdrop-blur-sm border-border/50">
                 <div className="flex items-start gap-2 mb-3">
                   {stat.emoji && (
                     <span className="text-lg">{stat.emoji}</span>
