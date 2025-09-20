@@ -27,6 +27,26 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     }
   };
   
+  const handleAddClick = () => {
+    if (user) {
+      onAddClick();
+    } else {
+      toast({
+        description: "Please sign in to add habits"
+      });
+    }
+  };
+  
+  const handleBreakClick = () => {
+    if (user) {
+      navigate("/vacation");
+    } else {
+      toast({
+        description: "Please sign in to schedule a vacation"
+      });
+    }
+  };
+  
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Plus, label: "Add", isAdd: true },
@@ -46,7 +66,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
             return (
               <Button
                 key={item.label}
-                onClick={onAddClick}
+                onClick={handleAddClick}
                 size="sm"
                 className="w-10 h-10 rounded-full bg-primary hover:bg-primary-glow text-primary-foreground shadow-lg hover:scale-105 transition-all duration-200"
               >
@@ -62,6 +82,23 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                 onClick={handleStatsClick}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
                   location.pathname === "/statistics"
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </button>
+            );
+          }
+          
+          if (item.label === "Break") {
+            return (
+              <button
+                key={item.label}
+                onClick={handleBreakClick}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  location.pathname === "/vacation"
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
