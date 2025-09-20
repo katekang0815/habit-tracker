@@ -47,6 +47,16 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     }
   };
   
+  const handleProfileClick = () => {
+    if (user) {
+      navigate("/profile");
+    } else {
+      toast({
+        description: "Please sign in to see the profile"
+      });
+    }
+  };
+  
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Plus, label: "Add", isAdd: true },
@@ -109,7 +119,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
             );
           }
           
-          if (item.label === "Profile" && user) {
+          if (item.label === "Profile") {
             return (
               <div
                 key={item.label}
@@ -118,7 +128,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                   if (timeoutRef.current) {
                     clearTimeout(timeoutRef.current);
                   }
-                  setShowSignOut(true);
+                  if (user) setShowSignOut(true);
                 }}
                 onMouseLeave={() => {
                   timeoutRef.current = setTimeout(() => {
@@ -127,7 +137,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                 }}
               >
                 <button
-                  onClick={() => navigate("/profile")}
+                  onClick={handleProfileClick}
                   className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
                     location.pathname === "/profile"
                       ? "text-primary"
@@ -138,7 +148,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
                   <span className="text-xs font-medium">{item.label}</span>
                 </button>
                 
-                {showSignOut && (
+                {showSignOut && user && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-max">
                     <Button
                       variant="ghost"
