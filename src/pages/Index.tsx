@@ -24,11 +24,11 @@ const Index = () => {
   const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit, reorderHabits } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
 
-  // Debounced date change to prevent rapid requests
-  const debouncedDateChange = useMemo(
-    () => debounce((date: Date) => setCurrentDate(date), 300),
-    []
-  );
+  // Handle date changes with proper cancellation
+  const handleDateChange = (date: Date) => {
+    console.log("Date change requested:", date.toISOString());
+    setCurrentDate(date);
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -102,7 +102,7 @@ const Index = () => {
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
+        <WeekView currentDate={currentDate} onDateChange={handleDateChange} />
       </div>
 
       {/* Main Content */}
