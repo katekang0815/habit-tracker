@@ -38,9 +38,10 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   // ----------------------------------------
 
   const fetchHabits = async () => {
-    console.log("fetchHabits called for date:", selectedDate.toDateString(), "user:", user?.id);
+    console.log("fetchHabits called for date:", selectedDate.toDateString(), "user:", user?.id, "current habits:", habits.length, "loading:", loading);
     
     if (!user) {
+      console.log("No user, clearing habits");
       setHabits([]);
       setLoading(false);
       return;
@@ -48,6 +49,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     // Cancel any in-flight requests
     if (abortControllerRef.current) {
+      console.log("Aborting previous request");
       abortControllerRef.current.abort();
     }
 
@@ -57,6 +59,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
     // Increment request version
     const currentRequestVersion = ++requestVersionRef.current;
+    console.log("Request version:", currentRequestVersion);
     
     // Check for duplicate requests
     const dateKey = selectedDate.toISOString();
@@ -94,7 +97,14 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
             can_toggle: false, // Historical data is read-only
           }));
           
+          console.log("Setting habits from snapshot:", habitsWithStatus.length);
           setHabits(habitsWithStatus);
+          setLoading(false);
+          return;
+        } else {
+          console.log("No snapshot data found for historical date, clearing habits");
+          // Clear habits if no snapshot exists for historical date
+          setHabits([]);
           setLoading(false);
           return;
         }
@@ -155,6 +165,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         can_toggle: !isPacificFutureDate(selectedDate) && !isDateInVacation(selectedDate),
       }));
 
+      console.log("Setting habits from live data:", habitsWithStatus.length);
       setHabits(habitsWithStatus);
     } catch (error: any) {
       // Ignore abort errors
