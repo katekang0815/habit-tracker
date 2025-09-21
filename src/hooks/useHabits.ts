@@ -29,9 +29,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   const { toast } = useToast();
   const { isDateInVacation } = useVacationSchedules();
   const { fetchSnapshot, runMigration } = useHabitSnapshots(user, selectedDate);
-  
-  // AbortController for request cancellation
-  const [currentAbortController, setCurrentAbortController] = useState<AbortController | null>(null);
 
   // ----------------------------------------
 
@@ -42,52 +39,35 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       return;
     }
 
-    // Cancel previous request if it exists
-    if (currentAbortController) {
-      currentAbortController.abort();
-    }
-
-    // Create new AbortController for this request
-    const abortController = new AbortController();
-    setCurrentAbortController(abortController);
-
     setLoading(true);
     
-    // Create a unique request identifier and capture current date
+    // Create a unique request identifier to handle race conditions
     const requestId = Date.now() + Math.random();
-    const currentSelectedDate = selectedDate;
-    
-    console.log("Fetching habits for date:", currentSelectedDate.toISOString(), "RequestID:", requestId);
+    const currentSelectedDate = selectedDate; // Capture the current selectedDate
     
     try {
-      // Check if request was aborted
-      if (abortController.signal.aborted) {
-        console.log("Request aborted before starting:", requestId);
-        return;
-      }
-
       // For historical dates (not today), fetch from snapshots
       if (!isPacificToday(currentSelectedDate)) {
         const snapshotHabits = await fetchSnapshot(currentSelectedDate);
         
-        // Check if request was aborted or date changed
-        if (abortController.signal.aborted || currentSelectedDate.getTime() !== selectedDate.getTime()) {
-          console.log("Request aborted or date changed during snapshot fetch:", requestId);
-          return;
-        }
-        
-        if (snapshotHabits && snapshotHabits.length > 0) {
-          const habitsWithStatus = snapshotHabits.map((snapshot: SnapshotHabit) => ({
-            id: snapshot.habit_id,
-            name: snapshot.habit_name,
-            emoji: '', // Not stored in snapshots
-            is_active: snapshot.is_active,
-            completed: snapshot.completed,
-            can_toggle: false, // Historical data is read-only
-          }));
-          
-          console.log("Setting snapshot habits:", requestId, habitsWithStatus.length);
-          setHabits(habitsWithStatus);
+        // Check if this is still the current request and date hasn't changed
+        if (currentSelectedDate.getTime() === selectedDate.getTime()) {
+          if (snapshotHabits && snapshotHabits.length > 0) {
+            const habitsWithStatus = snapshotHabits.map((snapshot: SnapshotHabit) => ({
+              id: snapshot.habit_id,
+              name: snapshot.habit_name,
+              emoji: '', // Not stored in snapshots
+              is_active: snapshot.is_active,
+              completed: snapshot.completed,
+              can_toggle: false, // Historical data is read-only
+            }));
+            
+            setHabits(habitsWithStatus);
+            setLoading(false);
+            return;
+          }
+        } else {
+          // Date changed while we were fetching, abort this request
           setLoading(false);
           return;
         }
@@ -107,9 +87,9 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       if (habitsError) throw habitsError;
 
-      // Check if request was aborted or date changed
-      if (abortController.signal.aborted || currentSelectedDate.getTime() !== selectedDate.getTime()) {
-        console.log("Request aborted or date changed after habits fetch:", requestId);
+      // Check if date hasn't changed while we were fetching
+      if (currentSelectedDate.getTime() !== selectedDate.getTime()) {
+        setLoading(false);
         return;
       }
 
@@ -128,9 +108,9 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
 
       if (completionsError) throw completionsError;
 
-      // Final check if request was aborted or date changed
-      if (abortController.signal.aborted || currentSelectedDate.getTime() !== selectedDate.getTime()) {
-        console.log("Request aborted or date changed after completions fetch:", requestId);
+      // Final check if date hasn't changed
+      if (currentSelectedDate.getTime() !== selectedDate.getTime()) {
+        setLoading(false);
         return;
       }
 
@@ -144,7 +124,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
         can_toggle: !isPacificFutureDate(currentSelectedDate) && !isDateInVacation(currentSelectedDate),
       }));
 
-      console.log("Setting dynamic habits:", requestId, habitsWithStatus.length);
       setHabits(habitsWithStatus);
     } catch (error) {
       console.error("Error fetching habits:", error);
@@ -334,7 +313,6 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   };
 
  useEffect(() => {
-    console.log("useEffect triggered - Date changed to:", selectedDate.toISOString());
     // Clear habits immediately when date changes
     setHabits([]);
     setLoading(true); // Make sure loading is set immediately

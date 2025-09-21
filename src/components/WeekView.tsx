@@ -16,6 +16,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   
   // Track if we're in a navigated week (not the current week)
   const [isNavigatedWeek, setIsNavigatedWeek] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(weekStart, i);
@@ -31,6 +32,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
     const previousWeekStart = subWeeks(currentDate, 1);
     const previousWeekSaturday = addDays(startOfWeek(previousWeekStart, { weekStartsOn: 0 }), 6);
     
+    setSelectedDate(previousWeekSaturday);
     setIsNavigatedWeek(true);
     onDateChange(previousWeekSaturday);
   };
@@ -38,6 +40,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   const goToNextWeek = () => {
     const nextWeekSunday = startOfWeek(addWeeks(currentDate, 1), { weekStartsOn: 0 });
     
+    setSelectedDate(nextWeekSunday);
     setIsNavigatedWeek(true);
     onDateChange(nextWeekSunday);
   };
@@ -45,6 +48,13 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   const handleDateClick = (date: Date) => {
     // When clicking a date, clear the navigated week state
     setIsNavigatedWeek(false);
+    
+    // If clicking the same date, deselect it
+    if (selectedDate && isSameDay(date, selectedDate)) {
+      setSelectedDate(null);
+    } else {
+      setSelectedDate(date);
+    }
     onDateChange(date);
   };
 
@@ -69,7 +79,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
                 className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
                   day.isToday
                     ? "bg-calendar-today text-white shadow-lg scale-105"
-                    : isSameDay(day.fullDate, currentDate)
+                    : selectedDate && isSameDay(day.fullDate, selectedDate)
                     ? "bg-amber-400 text-white shadow-lg scale-105"
                     : isNavigatedWeek && day.fullDate <= today
                     ? "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
