@@ -1,7 +1,7 @@
 import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks, isWithinInterval } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -14,10 +14,7 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Start on Sunday
   const weekEnd = addDays(weekStart, 6);
   
-  // Track if we're in a navigated week (not the current week)
-  const [isNavigatedWeek, setIsNavigatedWeek] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  
+  // Remove internal state management - rely on parent's currentDate
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(weekStart, i);
     return {
@@ -25,36 +22,23 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
       date: parseInt(format(date, "d")),
       fullDate: date,
       isToday: isSameDay(date, today),
+      isSelected: isSameDay(date, currentDate),
     };
   });
 
   const goToPreviousWeek = () => {
-    const previousWeekStart = subWeeks(currentDate, 1);
-    const previousWeekSaturday = addDays(startOfWeek(previousWeekStart, { weekStartsOn: 0 }), 6);
-    
-    setSelectedDate(previousWeekSaturday);
-    setIsNavigatedWeek(true);
-    onDateChange(previousWeekSaturday);
+    // Navigate to the same day of the previous week
+    const previousWeekDate = subWeeks(currentDate, 1);
+    onDateChange(previousWeekDate);
   };
 
   const goToNextWeek = () => {
-    const nextWeekSunday = startOfWeek(addWeeks(currentDate, 1), { weekStartsOn: 0 });
-    
-    setSelectedDate(nextWeekSunday);
-    setIsNavigatedWeek(true);
-    onDateChange(nextWeekSunday);
+    // Navigate to the same day of the next week
+    const nextWeekDate = addWeeks(currentDate, 1);
+    onDateChange(nextWeekDate);
   };
 
   const handleDateClick = (date: Date) => {
-    // When clicking a date, clear the navigated week state
-    setIsNavigatedWeek(false);
-    
-    // If clicking the same date, deselect it
-    if (selectedDate && isSameDay(date, selectedDate)) {
-      setSelectedDate(null);
-    } else {
-      setSelectedDate(date);
-    }
     onDateChange(date);
   };
 
@@ -77,12 +61,12 @@ const WeekView = ({ currentDate, onDateChange, isToggled }: WeekViewProps) => {
               </span>
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 cursor-pointer ${
-                  day.isToday
+                  day.isToday && day.isSelected
+                    ? "bg-calendar-today text-white shadow-lg scale-105 ring-2 ring-amber-400"
+                    : day.isToday
                     ? "bg-calendar-today text-white shadow-lg scale-105"
-                    : selectedDate && isSameDay(day.fullDate, selectedDate)
+                    : day.isSelected
                     ? "bg-amber-400 text-white shadow-lg scale-105"
-                    : isNavigatedWeek && day.fullDate <= today
-                    ? "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
                     : day.fullDate > today
                     ? "bg-muted text-muted-foreground"
                     : "bg-primary text-primary-foreground hover:bg-primary-glow hover:scale-105"
