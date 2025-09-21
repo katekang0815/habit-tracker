@@ -36,8 +36,8 @@ const Statistics = () => {
             key={day}
             className={`w-6 h-6 rounded-sm flex items-center justify-center text-xs font-medium transition-all ${
               completedDays.has(day)
-                ? `${habitColor} text-white gap-4`
-                : "bg-muted/30 text-muted-foreground gap-4"
+                ? `${habitColor} text-white`
+                : "bg-muted/40 text-muted-foreground"
             }`}
           >
             {day}
