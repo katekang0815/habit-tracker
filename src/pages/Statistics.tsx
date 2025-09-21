@@ -30,7 +30,7 @@ const Statistics = () => {
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     
     return (
-      <div className="grid grid-cols-7 gap-2 mt-1">
+      <div className="grid grid-cols-7 gap-2 mt-0">
         {days.map((day) => (
           <div
             key={day}
