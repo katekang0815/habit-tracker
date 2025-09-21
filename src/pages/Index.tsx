@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { WeekView } from "@/components/WeekView";
 import { HabitList } from "@/components/HabitList";
@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useHabits } from "@/hooks/useHabits";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import { isPacificToday } from "@/lib/pacific-time";
+import { debounce } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -23,10 +24,11 @@ const Index = () => {
   const { habits, loading, addHabit, toggleHabit, deleteHabit, pauseHabit, activateHabit, reorderHabits } = useHabits(user, currentDate);
   const { isDateInVacation } = useVacationSchedules();
 
-  // Direct date change without debouncing
-  const handleDateChange = (date: Date) => {
-    setCurrentDate(date);
-  };
+  // Debounced date change to prevent rapid requests
+  const debouncedDateChange = useMemo(
+    () => debounce((date: Date) => setCurrentDate(date), 300),
+    []
+  );
 
   useEffect(() => {
     // Set up auth state listener
@@ -100,7 +102,7 @@ const Index = () => {
           <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={handleDateChange} />
+        <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
       </div>
 
       {/* Main Content */}
@@ -118,7 +120,7 @@ const Index = () => {
               </div>
             ))}
           </div>
-        ) : habits.length === 0 && !loading ? (
+        ) : habits.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <span className="text-2xl">🌱</span>
