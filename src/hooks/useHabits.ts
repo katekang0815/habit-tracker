@@ -38,6 +38,8 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   // ----------------------------------------
 
   const fetchHabits = async () => {
+    console.log("fetchHabits called for date:", selectedDate.toDateString(), "user:", user?.id);
+    
     if (!user) {
       setHabits([]);
       setLoading(false);
@@ -58,12 +60,13 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     
     // Check for duplicate requests
     const dateKey = selectedDate.toISOString();
-    if (lastRequestedDateRef.current === dateKey && habits.length > 0) {
+    if (lastRequestedDateRef.current === dateKey) {
       console.log("Skipping duplicate request for date:", dateKey);
       return;
     }
     lastRequestedDateRef.current = dateKey;
 
+    console.log("Starting fetch for date:", selectedDate.toDateString(), "isToday:", isPacificToday(selectedDate));
     setLoading(true);
     
     try {
@@ -122,6 +125,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       }
 
       if (!habitsData || habitsData.length === 0) {
+        console.log("No habits found for user");
         setHabits([]);
         setLoading(false);
         return;
@@ -349,6 +353,10 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
   };
 
   useEffect(() => {
+    // Clear the last requested date when selectedDate changes
+    // This ensures we don't skip the request for the new date
+    lastRequestedDateRef.current = "";
+    
     // Don't clear habits immediately to prevent flash of empty content
     // The loading state will handle the UI feedback
     fetchHabits();
