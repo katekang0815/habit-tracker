@@ -34,7 +34,7 @@ const Statistics = () => {
         {days.map((day) => (
           <div
             key={day}
-            className={`w-6.5 h-6.5 rounded-sm flex items-center justify-center text-xs font-medium transition-all ${
+            className={` rounded-sm flex items-center justify-center text-xs font-medium transition-all ${
               completedDays.has(day)
                 ? `${habitColor} text-white`
                 : "bg-muted/40 text-muted-foreground"
