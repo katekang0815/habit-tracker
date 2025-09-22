@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, StarHalf, Sparkles, MoreVertical, Trash2, Pause, Play, GripVertical } from "lucide-react";
+import { DeleteHabitDialog } from "@/components/DeleteHabitDialog";
 import {
   DndContext,
   closestCenter,
@@ -57,6 +58,7 @@ interface SortableHabitItemProps {
   onDeleteHabit: (id: string) => void;
   onPauseHabit: (id: string) => void;
   onActivateHabit: (id: string) => void;
+  onOpenDeleteDialog: (habit: Habit) => void;
   isVacationDate: boolean;
   isHistoricalDate: boolean;
   canReorder: boolean;
@@ -70,6 +72,7 @@ const SortableHabitItem = ({
   onDeleteHabit, 
   onPauseHabit, 
   onActivateHabit, 
+  onOpenDeleteDialog,
   isVacationDate, 
   isHistoricalDate,
   canReorder 
@@ -183,7 +186,7 @@ const SortableHabitItem = ({
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
-                  onClick={() => onDeleteHabit(habit.id)}
+                  onClick={() => onOpenDeleteDialog(habit)}
                   className="flex items-center gap-2 text-destructive hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -210,6 +213,8 @@ const HabitList = ({
   canReorder = false 
 }: HabitListProps) => {
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -240,6 +245,18 @@ const HabitList = ({
     onToggleHabit(id);
   };
 
+  const handleOpenDeleteDialog = (habit: Habit) => {
+    setHabitToDelete(habit);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (habitToDelete) {
+      onDeleteHabit(habitToDelete.id);
+      setHabitToDelete(null);
+    }
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -255,33 +272,7 @@ const HabitList = ({
   if (!canReorder) {
     // Non-draggable version for historical/vacation dates
     return (
-      <div className="space-y-3">
-        {habits.map((habit, index) => (
-          <SortableHabitItem
-            key={habit.id}
-            habit={habit}
-            index={index}
-            animatingHabits={animatingHabits}
-            onToggleHabit={handleToggleHabit}
-            onDeleteHabit={onDeleteHabit}
-            onPauseHabit={onPauseHabit}
-            onActivateHabit={onActivateHabit}
-            isVacationDate={isVacationDate}
-            isHistoricalDate={isHistoricalDate}
-            canReorder={false}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <DndContext 
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
+      <>
         <div className="space-y-3">
           {habits.map((habit, index) => (
             <SortableHabitItem
@@ -293,14 +284,60 @@ const HabitList = ({
               onDeleteHabit={onDeleteHabit}
               onPauseHabit={onPauseHabit}
               onActivateHabit={onActivateHabit}
+              onOpenDeleteDialog={handleOpenDeleteDialog}
               isVacationDate={isVacationDate}
               isHistoricalDate={isHistoricalDate}
-              canReorder={canReorder}
+              canReorder={false}
             />
           ))}
         </div>
-      </SortableContext>
-    </DndContext>
+        
+        <DeleteHabitDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          habitName={habitToDelete?.name || ""}
+          onConfirm={handleConfirmDelete}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <DndContext 
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-3">
+            {habits.map((habit, index) => (
+              <SortableHabitItem
+                key={habit.id}
+                habit={habit}
+                index={index}
+                animatingHabits={animatingHabits}
+                onToggleHabit={handleToggleHabit}
+                onDeleteHabit={onDeleteHabit}
+                onPauseHabit={onPauseHabit}
+                onActivateHabit={onActivateHabit}
+                onOpenDeleteDialog={handleOpenDeleteDialog}
+                isVacationDate={isVacationDate}
+                isHistoricalDate={isHistoricalDate}
+                canReorder={canReorder}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+        
+      <DeleteHabitDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        habitName={habitToDelete?.name || ""}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   );
 };
 
