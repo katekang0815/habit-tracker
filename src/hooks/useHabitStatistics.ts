@@ -42,7 +42,6 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         .from('habits')
         .select('id, name, emoji, created_at')
         .eq('user_id', user.id)
-        .eq('is_active', true)
         .lte('created_at', formatPacificDateString(monthEnd))
         .order('created_at', { ascending: true });
 
