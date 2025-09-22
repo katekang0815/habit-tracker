@@ -24,8 +24,8 @@ const WarningIcon = () => (
       <div className="absolute top-5 left-5 w-2 h-2 bg-gray-700 rounded-full"></div>
       <div className="absolute top-5 right-5 w-2 h-2 bg-gray-700 rounded-full"></div>
       {/* Red exclamation mark */}
-      <div className="absolute top-1 right-1 w-2 h-7 bg-red-500 rounded-full"></div>
-      <div className="absolute bottom-5 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+      <div className="absolute top-0 right-1 w-2 h-7 bg-red-500 rounded-full"></div>
+      <div className="absolute bottom-6 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
     </div>
   </div>
 );
