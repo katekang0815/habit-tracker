@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useVacationSchedules } from "@/hooks/useVacationSchedules";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,14 @@ const Vacation = () => {
   const { user } = useAuth();
   const { addVacationSchedule, updateVacationSchedule, vacationSchedules, deleteVacationSchedule } = useVacationSchedules();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Redirect to home page when user logs out
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showStartCalendar, setShowStartCalendar] = useState(false);

@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ const MAX_FILE_MB = 5;
 
 const Profile = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
@@ -24,6 +26,13 @@ const Profile = () => {
   const [initialData, setInitialData] = useState({ name: "", bio: "", linkedIn: "", avatarUrl: "" });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Redirect to home page when user logs out
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   // Load profile data on component mount
   useEffect(() => {

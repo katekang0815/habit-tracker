@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { format, getDaysInMonth, startOfMonth, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +13,14 @@ const Statistics = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { user } = useAuth();
   const { habitStats, loading } = useHabitStatistics(user, currentDate);
+  const navigate = useNavigate();
+
+  // Redirect to home page when user logs out
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -60,14 +69,7 @@ const Statistics = () => {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-muted-foreground">Statistics</h2>
-          <p className="text-muted-foreground">Please sign in to view your habit statistics</p>
-        </div>
-      </div>
-    );
+    return null; // Will redirect to home page
   }
 
   return (
