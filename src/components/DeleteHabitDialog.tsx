@@ -46,7 +46,7 @@ export function DeleteHabitDialog({
       <DialogContent className="sm:max-w-[425px] p-8 bg-white dark:bg-gray-900 border-0 rounded-3xl shadow-2xl">
         <DialogHeader className="text-center space-y-6">
           <WarningIcon />
-          <DialogTitle className="text-2xl font-bold text-black dark:text-white">
+          <DialogTitle className="text-2xl font-bold text-black dark:text-white px-4">
             All records will be deleted!
           </DialogTitle>
           <DialogDescription className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed px-4">
