@@ -157,19 +157,19 @@ const Index = () => {
         )}
         </div>
 
-        {/* Bottom Navigation */}
-        <BottomNavigation 
-          onAddClick={() => setIsAddDialogOpen(true)} 
-          user={user}
-          onSignOut={handleSignOut}
-        />
-
         {/* Add Habit Dialog */}
         <AddHabitDialog
           open={isAddDialogOpen}
           onOpenChange={setIsAddDialogOpen}
           onAddHabit={addHabit}
           existingHabits={habits}
+        />
+
+        {/* Bottom Navigation */}
+        <BottomNavigation 
+          onAddClick={() => setIsAddDialogOpen(true)} 
+          user={user}
+          onSignOut={handleSignOut}
         />
       </div>
     </div>
