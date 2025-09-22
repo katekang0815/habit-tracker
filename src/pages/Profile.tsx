@@ -13,7 +13,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 const MAX_FILE_MB = 5;
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -27,12 +27,12 @@ const Profile = () => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Redirect to home page when user logs out
+  // Redirect to home page when user is definitely not authenticated
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   // Load profile data on component mount
   useEffect(() => {

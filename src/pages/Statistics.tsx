@@ -11,16 +11,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Statistics = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { habitStats, loading } = useHabitStatistics(user, currentDate);
   const navigate = useNavigate();
 
-  // Redirect to home page when user logs out
+  // Redirect to home page when user is definitely not authenticated
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

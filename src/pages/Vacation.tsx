@@ -19,17 +19,17 @@ import { cn } from "@/lib/utils";
 import { formatPacificDateString, parsePacificDateString } from "@/lib/pacific-time";
 
 const Vacation = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { addVacationSchedule, updateVacationSchedule, vacationSchedules, deleteVacationSchedule } = useVacationSchedules();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect to home page when user logs out
+  // Redirect to home page when user is definitely not authenticated
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showStartCalendar, setShowStartCalendar] = useState(false);
