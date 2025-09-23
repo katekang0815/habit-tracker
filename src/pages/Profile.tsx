@@ -4,7 +4,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Camera, Edit2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -17,13 +18,19 @@ const Profile = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [linkedIn, setLinkedIn] = useState("");
+  const [url, setUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [initialData, setInitialData] = useState({ name: "", bio: "", linkedIn: "", avatarUrl: "" });
+  const [initialData, setInitialData] = useState({ name: "", bio: "", url: "", avatarUrl: "" });
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalName, setModalName] = useState("");
+  const [modalBio, setModalBio] = useState("");
+  const [modalUrl, setModalUrl] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -55,13 +62,13 @@ const Profile = () => {
           const profileData = {
             name: data.display_name || "",
             bio: data.bio || "",
-            linkedIn: data.linkedin || "",
+            url: data.linkedin || "",
             avatarUrl: data.avatar_url || ""
           };
           
           setName(profileData.name);
           setBio(profileData.bio);
-          setLinkedIn(profileData.linkedIn);
+          setUrl(profileData.url);
           setAvatarUrl(profileData.avatarUrl);
           setInitialData(profileData);
         }
@@ -77,14 +84,21 @@ const Profile = () => {
 
   // enable/disable Save button
   const isDirty = useMemo(() => {
+    if (isModalOpen) {
+      return (
+        modalName !== name ||
+        modalBio !== bio ||
+        modalUrl !== url
+      );
+    }
     return (
       name !== initialData.name ||
       bio !== initialData.bio ||
-      linkedIn !== initialData.linkedIn ||
+      url !== initialData.url ||
       // If a preview exists, user changed avatar locally
       !!previewUrl
     );
-  }, [name, bio, linkedIn, previewUrl, initialData]);
+  }, [name, bio, url, previewUrl, initialData, isModalOpen, modalName, modalBio, modalUrl]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -155,15 +169,23 @@ const Profile = () => {
         }
       }
 
+      // Use modal values if modal is open, otherwise use current values
+      const saveData = isModalOpen ? {
+        display_name: modalName,
+        bio: modalBio,
+        linkedin: modalUrl,
+        avatar_url: newAvatarUrl,
+      } : {
+        display_name: name,
+        bio: bio,
+        linkedin: url,
+        avatar_url: newAvatarUrl,
+      };
+
       // Step 2 & 3: Update profile with new data including avatar URL
       const { error } = await supabase
         .from('profiles')
-        .update({
-          display_name: name,
-          bio: bio,
-          linkedin: linkedIn,
-          avatar_url: newAvatarUrl,
-        })
+        .update(saveData)
         .eq('user_id', user.id);
 
       if (error) {
@@ -172,9 +194,21 @@ const Profile = () => {
         return;
       }
 
-      // Step 5: Clear preview state and update initial data
+      // Step 5: Update state and close modal if open
+      if (isModalOpen) {
+        setName(modalName);
+        setBio(modalBio);
+        setUrl(modalUrl);
+        setIsModalOpen(false);
+      }
+      
       setAvatarUrl(newAvatarUrl);
-      const newInitialData = { name, bio, linkedIn, avatarUrl: newAvatarUrl };
+      const newInitialData = { 
+        name: isModalOpen ? modalName : name, 
+        bio: isModalOpen ? modalBio : bio, 
+        url: isModalOpen ? modalUrl : url, 
+        avatarUrl: newAvatarUrl 
+      };
       setInitialData(newInitialData);
       setPreviewUrl("");
       setSelectedFile(null);
@@ -191,6 +225,20 @@ const Profile = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEditClick = () => {
+    setModalName(name);
+    setModalBio(bio);
+    setModalUrl(url);
+    setIsModalOpen(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalName(name);
+    setModalBio(bio);
+    setModalUrl(url);
+    setIsModalOpen(false);
   };
 
   // Handlers for BottomNavigation
@@ -263,19 +311,16 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Fields Container */}
+        {/* Fields Container - Read Only Display */}
         <div className="space-y-8 rounded-xl border border-gray-300 bg-background p-5">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-3">
               Name
             </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-            />
+            <div className="px-3 py-2 min-h-[40px] flex items-center text-foreground">
+              {name || "No name set"}
+            </div>
           </div>
 
           {/* Bio */}
@@ -283,40 +328,107 @@ const Profile = () => {
             <label className="block text-sm font-medium text-muted-foreground mb-3">
               Bio
             </label>
-            <Textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="min-h-[100px] resize-none border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-              placeholder="Say Hello ~"
-            />
+            <div className="px-3 py-2 min-h-[100px] flex items-start text-foreground">
+              {bio || "No bio set"}
+            </div>
           </div>
 
-          {/* LinkedIn */}
+          {/* URL */}
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-3">
-              Notion Workspace
+              URL
             </label>
-            <Input
-              value={linkedIn}
-              onChange={(e) => setLinkedIn(e.target.value)}
-              placeholder="share your Notion workspace URL"
-              inputMode="url"
-              className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-            />
+            <div className="px-3 py-2 min-h-[40px] flex items-center text-foreground">
+              {url ? (
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+                  {url}
+                </a>
+              ) : (
+                "No URL set"
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Save Button */}
+        {/* Edit Button */}
         <div className="mt-6 mb-8">
           <Button
             className="w-full"
-            disabled={!isDirty || saving || loading}
-            onClick={handleSaveAll}
+            onClick={handleEditClick}
             type="button"
           >
-            {saving ? "Saving..." : "Save changes"}
+            <Edit2 className="w-4 h-4 mr-2" />
+            Edit Profile
           </Button>
         </div>
+
+        {/* Edit Profile Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Profile</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-3">
+                  Name
+                </label>
+                <Input
+                  value={modalName}
+                  onChange={(e) => setModalName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+                />
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-3">
+                  Bio
+                </label>
+                <Textarea
+                  value={modalBio}
+                  onChange={(e) => setModalBio(e.target.value)}
+                  className="min-h-[100px] resize-none border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+                  placeholder="Say Hello ~"
+                />
+              </div>
+
+              {/* URL */}
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-3">
+                  URL
+                </label>
+                <Input
+                  value={modalUrl}
+                  onChange={(e) => setModalUrl(e.target.value)}
+                  placeholder="Enter your URL"
+                  inputMode="url"
+                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={handleModalCancel}
+                type="button"
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={!isDirty || saving}
+                onClick={handleSaveAll}
+                type="button"
+              >
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <BottomNavigation 
