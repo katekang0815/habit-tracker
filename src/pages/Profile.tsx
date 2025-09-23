@@ -321,7 +321,7 @@ const Profile = () => {
             <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
               <p className="text-foreground font-medium">
                 {name || (
-                  <span className="text-muted-foreground italic">No name set</span>
+                  <span className="text-muted-foreground italic">Introduce your name!</span>
                 )}
               </p>
             </div>
@@ -335,7 +335,7 @@ const Profile = () => {
             <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent min-h-[100px] transition-all duration-200">
               <p className="text-foreground leading-relaxed">
                 {bio || (
-                  <span className="text-muted-foreground italic">No bio set</span>
+                  <span className="text-muted-foreground italic">Say Hello ~ </span>
                 )}
               </p>
             </div>
@@ -357,7 +357,7 @@ const Profile = () => {
                   {url}
                 </a>
               ) : (
-                <span className="text-muted-foreground italic">No URL set</span>
+                <span className="text-muted-foreground italic">Share your public URL</span>
               )}
             </div>
           </div>
