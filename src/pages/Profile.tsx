@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Camera, Edit2 } from "lucide-react";
+import { Camera, Edit2, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -363,10 +363,21 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Edit Button */}
-        <div className="mt-6 mb-8">
+        {/* Action Buttons */}
+        <div className="mt-6 mb-8 grid grid-cols-2 gap-3">
           <Button
-            className="w-full"
+            variant="outline"
+            onClick={() => {
+              // Share functionality - could copy profile URL to clipboard
+              navigator.clipboard.writeText(window.location.href);
+              // You can add a toast notification here if needed
+            }}
+            type="button"
+          >
+            <Share className="w-4 h-4 mr-2" />
+            Share
+          </Button>
+          <Button
             onClick={handleEditClick}
             type="button"
           >
