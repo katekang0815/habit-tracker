@@ -105,7 +105,7 @@ const SortableHabitItem = ({
       ref={setNodeRef}
       style={style}
       className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
-        !habit.can_toggle ? 'opacity-50' : ''
+        !habit.can_toggle ? 'opacity-10' : ''
       } ${isVacationDate ? 'opacity-70' : ''} ${!habit.is_active ? 'opacity-40 grayscale' : ''} ${
         isDragging ? 'opacity-50 scale-105 z-50' : ''
       }`}
