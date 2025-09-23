@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Camera, Edit2, Share } from "lucide-react";
+import { Camera, Edit2, Share, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -382,8 +382,11 @@ const Profile = () => {
                   Share
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Share your habit list to your Social page</p>
+              <TooltipContent className="p-1">
+                <div className="flex items-center gap-1">
+                  <Heart className="w-3 h-3 text-red-500" />
+                  <p>Share your habit list to your Social page</p>
+                </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
