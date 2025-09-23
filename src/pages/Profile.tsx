@@ -312,39 +312,52 @@ const Profile = () => {
         </div>
 
         {/* Fields Container - Read Only Display */}
-        <div className="space-y-8 rounded-xl border border-gray-300 bg-background p-5">
+        <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
           {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-3">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Name
             </label>
-            <div className="px-3 py-2 min-h-[40px] flex items-center text-foreground">
-              {name || "No name set"}
+            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
+              <p className="text-foreground font-medium">
+                {name || (
+                  <span className="text-muted-foreground italic">No name set</span>
+                )}
+              </p>
             </div>
           </div>
 
           {/* Bio */}
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-3">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Bio
             </label>
-            <div className="px-3 py-2 min-h-[100px] flex items-start text-foreground">
-              {bio || "No bio set"}
+            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent min-h-[100px] transition-all duration-200">
+              <p className="text-foreground leading-relaxed">
+                {bio || (
+                  <span className="text-muted-foreground italic">No bio set</span>
+                )}
+              </p>
             </div>
           </div>
 
           {/* URL */}
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-3">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               URL
             </label>
-            <div className="px-3 py-2 min-h-[40px] flex items-center text-foreground">
+            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
               {url ? (
-                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+                <a 
+                  href={url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
+                >
                   {url}
                 </a>
               ) : (
-                "No URL set"
+                <span className="text-muted-foreground italic">No URL set</span>
               )}
             </div>
           </div>
