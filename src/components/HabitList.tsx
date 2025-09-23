@@ -130,7 +130,7 @@ const SortableHabitItem = ({
             <span className="text-xl">{habit.emoji}</span>
           )}
           <span className={`font-medium transition-all duration-300 text-foreground ${
-            isVacationDate ? 'line-through text-muted-foreground' : ''
+            isVacationDate ? 'text-muted-foreground' : ''
           } ${!habit.is_active ? 'text-muted-foreground' : ''}`}>
             {habit.name}
           </span>
