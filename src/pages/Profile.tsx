@@ -6,18 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Camera, Edit2, Share2 } from "lucide-react";
+import { Camera, Edit2, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { useSocialSharing } from "@/hooks/useSocialSharing";
 
 const MAX_FILE_MB = 5;
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isShared, toggleSharing } = useSocialSharing(user);
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -374,24 +372,20 @@ const Profile = () => {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    toggleSharing();
-                    // Navigate to social page after sharing
-                    if (!isShared) {
-                      setTimeout(() => {
-                        navigate('/social');
-                      }, 1000);
-                    }
+                    // Share functionality - could copy profile URL to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    // You can add a toast notification here if needed
                   }}
                   type="button"
                 >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  {isShared ? 'Unshare' : 'Share'}
+                  <Share className="w-4 h-4 mr-2" />
+                  Share
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="p-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">❤️</span>
-                  <p>{isShared ? 'Unshare' : 'Share'} your habit list to your Social page</p>
+                  <p>Share your habit list to your Social page</p>
                 </div>
               </TooltipContent>
             </Tooltip>
