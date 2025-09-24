@@ -366,8 +366,8 @@ const Profile = () => {
 
         {/* Action Buttons */}
         <div className="mt-6 mb-8 grid grid-cols-2 gap-3">
-          <TooltipProvider>
-            <Tooltip>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
