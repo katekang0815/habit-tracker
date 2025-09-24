@@ -436,7 +436,7 @@ const Profile = () => {
               {/* URL */}
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  URL
+                  Notion URL
                 </label>
                 <Input
                   value={modalUrl}
