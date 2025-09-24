@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSocialSharing } from "@/hooks/useSocialSharing";
 import { UserCard } from "@/components/UserCard";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Social = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { sharedUsers, loading, fetchSharedUsers } = useSocialSharing(user);
 
@@ -22,6 +23,13 @@ const Social = () => {
       fetchSharedUsers();
     }
   }, [user, authLoading, navigate, fetchSharedUsers]);
+
+  // Refresh shared users when navigating to this page (e.g., from profile after sharing)
+  useEffect(() => {
+    if (user && location.pathname === '/social') {
+      fetchSharedUsers();
+    }
+  }, [location.pathname, user, fetchSharedUsers]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

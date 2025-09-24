@@ -110,6 +110,10 @@ export const useSocialSharing = (user: User | null) => {
         if (error) throw error;
 
         setShareStatus({ ...shareStatus, is_active: false });
+        
+        // Remove user from shared users list
+        setSharedUsers(prev => prev.filter(u => u.user_id !== user.id));
+        
         toast({
           title: "Success",
           description: "Your profile has been unshared",
@@ -130,6 +134,34 @@ export const useSocialSharing = (user: User | null) => {
         if (error) throw error;
 
         setShareStatus(data);
+        
+        // Fetch user profile and add to shared users list immediately
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name, avatar_url, bio, linkedin')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile) {
+          const newSharedUser: SharedUser = {
+            user_id: user.id,
+            display_name: profile.display_name || 'Anonymous',
+            avatar_url: profile.avatar_url,
+            bio: profile.bio,
+            linkedin: profile.linkedin,
+            is_active: true,
+          };
+          
+          // Add to the beginning of the list if not already present
+          setSharedUsers(prev => {
+            const exists = prev.some(u => u.user_id === user.id);
+            if (!exists) {
+              return [newSharedUser, ...prev];
+            }
+            return prev;
+          });
+        }
+        
         toast({
           title: "Success",
           description: "Your profile has been shared to the social page",
