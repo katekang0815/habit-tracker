@@ -55,7 +55,7 @@ export const useSocialSharing = (user: User | null) => {
         .select(`
           user_id,
           is_active,
-          profiles:user_id (
+          profiles!fk_social_shares_profiles (
             display_name,
             avatar_url,
             bio,
