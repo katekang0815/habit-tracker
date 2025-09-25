@@ -378,31 +378,43 @@ const Profile = () => {
 
         {/* Action Buttons */}
         <div className="mt-6 mb-8 grid grid-cols-2 gap-3">
-          <TooltipProvider delayDuration={0}>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    await handleShare();
-                  }}
-                  disabled={shareLoading}
-                  type="button"
-                >
-                  <Share className="w-4 h-4 mr-2" />
-                  {shareLoading ? "Updating..." : isSharing ? "Unshare" : "Share"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="p-0">
-                {!isSharing && (
-                  <div className="flex items-center gap-0">
+          {!isSharing ? (
+            <TooltipProvider delayDuration={0}>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      await handleShare();
+                    }}
+                    disabled={shareLoading}
+                    type="button"
+                  >
+                    <Share className="w-4 h-4 mr-2" />
+                    {shareLoading ? "Updating..." : "Share"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex items-center gap-1">
                     <span className="text-sm">❤️</span>
                     <p>Share your habit list to your Social page</p>
                   </div>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await handleShare();
+              }}
+              disabled={shareLoading}
+              type="button"
+            >
+              <Share className="w-4 h-4 mr-2" />
+              {shareLoading ? "Updating..." : "Unshare"}
+            </Button>
+          )}
           <Button
             onClick={handleEditClick}
             type="button"
