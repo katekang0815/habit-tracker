@@ -1,20 +1,46 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSocialSharing } from "@/hooks/useSocialSharing";
+import { useAuth } from "@/hooks/useAuth";
 import { UserProfileCard } from "@/components/UserProfileCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { supabase } from "@/integrations/supabase/client";
 
 const Social = () => {
+  const { user, loading: authLoading } = useAuth();
   const { sharedUsers, loading, fetchSharedUsers } = useSocialSharing();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/");
+      return;
+    }
     fetchSharedUsers();
-  }, []);
+  }, [user, authLoading, navigate]);
 
   const handleUserCardClick = (userId: string) => {
     // Placeholder for future individual user page navigation
     console.log("Clicked user:", userId);
   };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
+  const handleAddClick = () => {
+    navigate("/");
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Skeleton className="h-8 w-32" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,9 +82,9 @@ const Social = () => {
       </main>
       
       <BottomNavigation 
-        onAddClick={() => {}}
-        user={null}
-        onSignOut={() => {}}
+        onAddClick={handleAddClick}
+        user={user}
+        onSignOut={handleSignOut}
       />
     </div>
   );
