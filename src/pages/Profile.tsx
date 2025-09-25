@@ -393,9 +393,9 @@ const Profile = () => {
                   {shareLoading ? "Updating..." : isSharing ? "Unshare" : "Share"}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="p-2">
+              <TooltipContent className="p-0">
                 {!isSharing && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0">
                     <span className="text-sm">❤️</span>
                     <p>Share your habit list to your Social page</p>
                   </div>
