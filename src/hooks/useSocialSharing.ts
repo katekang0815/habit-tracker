@@ -3,9 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "@/hooks/use-toast";
 
-// Temporary workaround for type safety until Supabase types are regenerated
-const socialSharesQuery = (supabase as any);
-
 export interface SharedUser {
   user_id: string;
   display_name: string | null;
@@ -26,7 +23,7 @@ export const useSocialSharing = () => {
     if (!user) return;
     
     try {
-      const { data } = await socialSharesQuery
+      const { data } = await supabase
         .from('social_shares')
         .select('is_active')
         .eq('user_id', user.id)
@@ -44,7 +41,7 @@ export const useSocialSharing = () => {
   const fetchSharedUsers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await socialSharesQuery
+      const { data, error } = await supabase
         .from('social_shares')
         .select(`
           user_id,
@@ -97,12 +94,15 @@ export const useSocialSharing = () => {
     try {
       if (isSharing) {
         // Unshare - deactivate sharing
-        const { error } = await socialSharesQuery
+        const { error } = await supabase
           .from('social_shares')
           .update({ is_active: false })
           .eq('user_id', user.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error unsharing profile:', error);
+          throw error;
+        }
 
         setIsSharing(false);
         toast({
@@ -110,15 +110,20 @@ export const useSocialSharing = () => {
           description: "Your profile is no longer visible to other users",
         });
       } else {
-        // Share - create or reactivate sharing
-        const { error } = await socialSharesQuery
+        // Share - create or reactivate sharing with proper conflict resolution
+        const { error } = await supabase
           .from('social_shares')
           .upsert({ 
             user_id: user.id,
             is_active: true 
+          }, {
+            onConflict: 'user_id'
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error sharing profile:', error);
+          throw error;
+        }
 
         setIsSharing(true);
         toast({
