@@ -357,7 +357,7 @@ const Profile = () => {
           {/* URL */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              URL
+              NOTION URL
             </label>
             <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
               {url ? (
@@ -395,7 +395,7 @@ const Profile = () => {
               </TooltipTrigger>
               <TooltipContent className="p-0">
                 {!isSharing && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0">
                     <span className="text-sm">❤️</span>
                     <p>Share your habit list to your Social page</p>
                   </div>
