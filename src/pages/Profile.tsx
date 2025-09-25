@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSocialSharing } from "@/hooks/useSocialSharing";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +17,7 @@ const MAX_FILE_MB = 5;
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
+  const { isSharing, toggleSharing, loading: shareLoading } = useSocialSharing();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -248,6 +250,16 @@ const Profile = () => {
     console.log("Add clicked from profile");
   };
 
+  const handleShare = async () => {
+    const wasSharing = isSharing;
+    await toggleSharing();
+    
+    // Navigate to social page only if user just enabled sharing
+    if (!wasSharing && !shareLoading) {
+      navigate('/social');
+    }
+  };
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -371,15 +383,14 @@ const Profile = () => {
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    // Share functionality - could copy profile URL to clipboard
-                    navigator.clipboard.writeText(window.location.href);
-                    // You can add a toast notification here if needed
+                  onClick={async () => {
+                    await handleShare();
                   }}
+                  disabled={shareLoading}
                   type="button"
                 >
                   <Share className="w-4 h-4 mr-2" />
-                  Share
+                  {shareLoading ? "Updating..." : isSharing ? "Unshare" : "Share"}
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="p-2">
