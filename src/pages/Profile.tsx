@@ -394,10 +394,12 @@ const Profile = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="p-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">❤️</span>
-                  <p>Share your habit list to your Social page</p>
-                </div>
+                {!isSharing && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">❤️</span>
+                    <p>Share your habit list to your Social page</p>
+                  </div>
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
