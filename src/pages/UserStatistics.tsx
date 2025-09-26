@@ -164,7 +164,7 @@ const UserStatistics = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pb-20">
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="container max-w-lg mx-auto px-4 py-6">
         {/* User Header */}
         <div className="bg-card rounded-lg p-6 mb-6 shadow-sm">
           <div className="flex items-center gap-4">
