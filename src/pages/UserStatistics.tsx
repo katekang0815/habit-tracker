@@ -141,7 +141,7 @@ const UserStatistics = () => {
   if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="container max-w-xl mx-auto">
           <div className="animate-pulse">
             <div className="h-16 bg-muted rounded-lg mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
