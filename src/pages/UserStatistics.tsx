@@ -97,7 +97,12 @@ const UserStatistics = () => {
     return colors[index % colors.length];
   };
 
-  const renderCalendarGrid = (habit: any, habitColor: string) => {
+  const getHabitBackgroundColor = (index: number) => {
+    const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500', 'bg-yellow-500'];
+    return colors[index % colors.length];
+  };
+
+  const renderCalendarGrid = (habit: any, habitIndex: number) => {
     const pacificDate = toPacificDate(currentDate);
     const daysInMonth = getDaysInMonth(pacificDate);
     const monthStart = startOfMonth(pacificDate);
@@ -122,10 +127,10 @@ const UserStatistics = () => {
           return (
             <div
               key={day}
-              className={`
+                className={`
                 p-1 h-7 w-7 flex items-center justify-center rounded-sm text-xs font-medium transition-all
                 ${isCompleted 
-                  ? `${habitColor} text-white ` 
+                  ? `${getHabitBackgroundColor(habitIndex)} text-white` 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }
               `}
@@ -229,7 +234,7 @@ const UserStatistics = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {renderCalendarGrid(habit, getHabitColor(index))}
+                  {renderCalendarGrid(habit, index)}
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className={`text-sm font-semibold ${getHabitColor(index)}`}>
                       {habit.completionPercentage}%
