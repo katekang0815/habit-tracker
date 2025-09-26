@@ -21,19 +21,21 @@ const Profile = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [url, setUrl] = useState("");
+  const [notionUrl, setNotionUrl] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [initialData, setInitialData] = useState({ name: "", bio: "", url: "", avatarUrl: "" });
+  const [initialData, setInitialData] = useState({ name: "", bio: "", notionUrl: "", linkedinUrl: "", avatarUrl: "" });
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalName, setModalName] = useState("");
   const [modalBio, setModalBio] = useState("");
-  const [modalUrl, setModalUrl] = useState("");
+  const [modalNotionUrl, setModalNotionUrl] = useState("");
+  const [modalLinkedinUrl, setModalLinkedinUrl] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -52,7 +54,7 @@ const Profile = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('display_name, bio, linkedin, avatar_url')
+          .select('display_name, bio, notion_url, linkedin, avatar_url')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -65,13 +67,15 @@ const Profile = () => {
           const profileData = {
             name: data.display_name || "",
             bio: data.bio || "",
-            url: data.linkedin || "",
+            notionUrl: data.notion_url || "",
+            linkedinUrl: data.linkedin || "",
             avatarUrl: data.avatar_url || ""
           };
           
           setName(profileData.name);
           setBio(profileData.bio);
-          setUrl(profileData.url);
+          setNotionUrl(profileData.notionUrl);
+          setLinkedinUrl(profileData.linkedinUrl);
           setAvatarUrl(profileData.avatarUrl);
           setInitialData(profileData);
         }
@@ -91,17 +95,19 @@ const Profile = () => {
       return (
         modalName !== name ||
         modalBio !== bio ||
-        modalUrl !== url
+        modalNotionUrl !== notionUrl ||
+        modalLinkedinUrl !== linkedinUrl
       );
     }
     return (
       name !== initialData.name ||
       bio !== initialData.bio ||
-      url !== initialData.url ||
+      notionUrl !== initialData.notionUrl ||
+      linkedinUrl !== initialData.linkedinUrl ||
       // If a preview exists, user changed avatar locally
       !!previewUrl
     );
-  }, [name, bio, url, previewUrl, initialData, isModalOpen, modalName, modalBio, modalUrl]);
+  }, [name, bio, notionUrl, linkedinUrl, previewUrl, initialData, isModalOpen, modalName, modalBio, modalNotionUrl, modalLinkedinUrl]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -176,12 +182,14 @@ const Profile = () => {
       const saveData = isModalOpen ? {
         display_name: modalName,
         bio: modalBio,
-        linkedin: modalUrl,
+        notion_url: modalNotionUrl,
+        linkedin: modalLinkedinUrl,
         avatar_url: newAvatarUrl,
       } : {
         display_name: name,
         bio: bio,
-        linkedin: url,
+        notion_url: notionUrl,
+        linkedin: linkedinUrl,
         avatar_url: newAvatarUrl,
       };
 
@@ -201,7 +209,8 @@ const Profile = () => {
       if (isModalOpen) {
         setName(modalName);
         setBio(modalBio);
-        setUrl(modalUrl);
+        setNotionUrl(modalNotionUrl);
+        setLinkedinUrl(modalLinkedinUrl);
         setIsModalOpen(false);
       }
       
@@ -209,7 +218,8 @@ const Profile = () => {
       const newInitialData = { 
         name: isModalOpen ? modalName : name, 
         bio: isModalOpen ? modalBio : bio, 
-        url: isModalOpen ? modalUrl : url, 
+        notionUrl: isModalOpen ? modalNotionUrl : notionUrl, 
+        linkedinUrl: isModalOpen ? modalLinkedinUrl : linkedinUrl,
         avatarUrl: newAvatarUrl 
       };
       setInitialData(newInitialData);
@@ -233,14 +243,16 @@ const Profile = () => {
   const handleEditClick = () => {
     setModalName(name);
     setModalBio(bio);
-    setModalUrl(url);
+    setModalNotionUrl(notionUrl);
+    setModalLinkedinUrl(linkedinUrl);
     setIsModalOpen(true);
   };
 
   const handleModalCancel = () => {
     setModalName(name);
     setModalBio(bio);
-    setModalUrl(url);
+    setModalNotionUrl(notionUrl);
+    setModalLinkedinUrl(linkedinUrl);
     setIsModalOpen(false);
   };
 
@@ -354,23 +366,44 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* URL */}
+          {/* Notion URL */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               NOTION URL
             </label>
             <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
-              {url ? (
+              {notionUrl ? (
                 <a 
-                  href={url} 
+                  href={notionUrl} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
                 >
-                  {url}
+                  {notionUrl}
                 </a>
               ) : (
-                <span className="text-muted-foreground italic">Share your public URL</span>
+                <span className="text-muted-foreground italic">Share your Notion URL</span>
+              )}
+            </div>
+          </div>
+
+          {/* LinkedIn URL */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              LINKEDIN
+            </label>
+            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
+              {linkedinUrl ? (
+                <a 
+                  href={linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
+                >
+                  {linkedinUrl}
+                </a>
+              ) : (
+                <span className="text-muted-foreground italic">Share your LinkedIn URL</span>
               )}
             </div>
           </div>
@@ -446,15 +479,29 @@ const Profile = () => {
                 />
               </div>
 
-              {/* URL */}
+              {/* Notion URL */}
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-3">
                   Notion URL
                 </label>
                 <Input
-                  value={modalUrl}
-                  onChange={(e) => setModalUrl(e.target.value)}
-                  placeholder="Enter your URL"
+                  value={modalNotionUrl}
+                  onChange={(e) => setModalNotionUrl(e.target.value)}
+                  placeholder="Enter your Notion URL"
+                  inputMode="url"
+                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+                />
+              </div>
+
+              {/* LinkedIn URL */}
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-3">
+                  LinkedIn URL
+                </label>
+                <Input
+                  value={modalLinkedinUrl}
+                  onChange={(e) => setModalLinkedinUrl(e.target.value)}
+                  placeholder="Enter your LinkedIn URL"
                   inputMode="url"
                   className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
                 />
