@@ -125,7 +125,7 @@ const UserStatistics = () => {
               className={`
                 p-1 h-7 w-7 flex items-center justify-center rounded-sm text-xs font-medium transition-all
                 ${isCompleted 
-                  ? `bg-current text-background text-white ${habitColor}` 
+                  ? `bg-current text-white ${habitColor}` 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }
               `}
