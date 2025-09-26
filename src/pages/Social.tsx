@@ -21,8 +21,7 @@ const Social = () => {
   }, [user, authLoading, navigate]);
 
   const handleUserCardClick = (userId: string) => {
-    // Placeholder for future individual user page navigation
-    console.log("Clicked user:", userId);
+    navigate(`/user/${userId}`);
   };
 
   const handleSignOut = async () => {

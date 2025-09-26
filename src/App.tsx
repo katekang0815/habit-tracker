@@ -8,6 +8,7 @@ import Statistics from "./pages/Statistics";
 import Vacation from "./pages/Vacation";
 import Social from "./pages/Social";
 import Profile from "./pages/Profile";
+import UserStatistics from "./pages/UserStatistics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/vacation" element={<Vacation />} />
           <Route path="/social" element={<Social />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/user/:userId" element={<UserStatistics />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

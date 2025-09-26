@@ -13,7 +13,7 @@ export interface HabitStatistic {
   completionPercentage: number;
 }
 
-export const useHabitStatistics = (user: User | null, currentDate: Date) => {
+export const useHabitStatistics = (user: User | null, currentDate: Date, targetUserId?: string) => {
   const [habitStats, setHabitStats] = useState<HabitStatistic[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,11 +37,14 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
       const isCurrentMonth = pacificDate.getFullYear() === currentPacificDate.getFullYear() && 
                            pacificDate.getMonth() === currentPacificDate.getMonth();
 
+      // Use targetUserId if provided, otherwise use current user's id
+      const userId = targetUserId || user.id;
+      
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
         .from('habits')
         .select('id, name, emoji, created_at')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .lte('created_at', formatPacificDateString(monthEnd))
         .order('created_at', { ascending: true });
 
@@ -61,7 +64,7 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
         const { data: monthCompletions, error: monthError } = await supabase
           .from('habit_completions')
           .select('habit_id, completion_date, completed')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .gte('completion_date', formatPacificDateString(monthStart))
           .lte('completion_date', formatPacificDateString(monthEnd))
           .eq('completed', true);
@@ -75,7 +78,7 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
       const { data: snapshotsData, error: snapshotsError } = await supabase
         .from('habit_snapshots')
         .select('snapshot_date, habits_data')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .gte('snapshot_date', formatPacificDateString(monthStart))
         .lt('snapshot_date', snapshotEndDate)
         .lte('snapshot_date', formatPacificDateString(monthEnd));
@@ -140,7 +143,7 @@ export const useHabitStatistics = (user: User | null, currentDate: Date) => {
 
   useEffect(() => {
     fetchHabitStatistics();
-  }, [user, currentDate]);
+  }, [user, currentDate, targetUserId]);
 
   return {
     habitStats,
