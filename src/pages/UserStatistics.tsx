@@ -226,7 +226,7 @@ const UserStatistics = () => {
         ) : (
           <div className="grid grid-cols-2 gap-1">
             {habitStats.map((habit, index) => (
-              <Card key={habit.habitId} className="p-1 bg-card/50 backdrop-blur-sm border-border/50">
+              <Card key={habit.habitId} className="p-0 bg-card/50 backdrop-blur-sm border-border/50">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-start gap-2 mb-3">
                     {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
