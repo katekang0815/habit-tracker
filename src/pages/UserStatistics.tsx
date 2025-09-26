@@ -228,12 +228,12 @@ const UserStatistics = () => {
             {habitStats.map((habit, index) => (
               <Card key={habit.habitId} className="p-0 bg-card/50 backdrop-blur-sm border-border/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-start gap-2 mb-2">
+                  <CardTitle className="flex items-start gap-2 mb-1">
                     {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
                     <span className="truncate text-sm font-semibold">{habit.habitName}</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 p-2">
+                <CardContent className="space-y-4 p-4">
                   {renderCalendarGrid(habit, index)}
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className={`pl-2 pb-2 text-xs font-semibold ${getHabitColor(index)}`}>
