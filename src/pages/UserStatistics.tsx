@@ -212,7 +212,7 @@ const UserStatistics = () => {
 
         {/* Statistics Grid */}
         {statsLoading ? (
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-2 gap-0.5">
             {Array.from({ length: 4 }, (_, i) => (
               <div key={i} className="h-64 bg-muted rounded-lg animate-pulse"></div>
             ))}
@@ -224,7 +224,7 @@ const UserStatistics = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-2 gap-0.5">
             {habitStats.map((habit, index) => (
               <Card key={habit.habitId} className="p-0 bg-card/50 backdrop-blur-sm border-border/50">
                 <CardHeader className="pb-3">
