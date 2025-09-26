@@ -233,7 +233,7 @@ const UserStatistics = () => {
                     <span className="truncate text-sm font-semibold">{habit.habitName}</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 pt-2">
+                <CardContent className="p-6 pt-0">
                   {renderCalendarGrid(habit, index)}
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className={`pl-2 pb-2 text-xs font-semibold ${getHabitColor(index)}`}>
