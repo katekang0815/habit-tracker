@@ -156,7 +156,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
         ) : userProfile ? (
           <div className="space-y-6">
             {/* User Header */}
-            <div className="border-2px border-t rounded-lg p-6 shadow-sm">
+            <div className="border-2px border-b rounded-lg p-6 shadow-sm">
               <div className="flex items-center gap-4">
                 {/* Avatar with First Letter */}
                 <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-semibold">
