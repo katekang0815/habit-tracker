@@ -168,7 +168,7 @@ const UserStatistics = () => {
   const firstLetter = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pb-20">
+    <div className="min-h-screen pb-20">
       <div className="container max-w-lg mx-auto px-4 py-6">
         {/* User Header */}
         <div className="bg-card rounded-lg p-6 mb-6 shadow-sm">
@@ -212,21 +212,21 @@ const UserStatistics = () => {
 
         {/* Statistics Grid */}
         {statsLoading ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-1">
             {Array.from({ length: 4 }, (_, i) => (
               <div key={i} className="h-64 bg-muted rounded-lg animate-pulse"></div>
             ))}
           </div>
         ) : habitStats.length === 0 ? (
-          <Card className=" col-span-2 text-center py-8">
+          <Card className=" col-span-2 text-center py-4">
             <CardContent>
               <p className="text-muted-foreground">No habit data available for this user in {format(currentDate, 'MMMM yyyy')}.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-1">
             {habitStats.map((habit, index) => (
-              <Card key={habit.habitId} className="p-3 bg-card/50 backdrop-blur-sm border-border/50">
+              <Card key={habit.habitId} className="p-1 bg-card/50 backdrop-blur-sm border-border/50">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-start gap-2 mb-3">
                     {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
