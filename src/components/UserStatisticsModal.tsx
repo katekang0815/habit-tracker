@@ -156,7 +156,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
         ) : userProfile ? (
           <div className="space-y-6">
             {/* User Header */}
-            <div className="border-2 border-b p-4 shadow-sm">
+            <div className="border-4 border-b border-red-800 p-4 shadow-sm">
               <div className="flex items-center gap-4">
                 {/* Avatar with First Letter */}
                 <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-semibold">
@@ -214,7 +214,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
                   <Card key={habit.habitId} className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
                     <CardHeader className="pb-0">
                       <CardTitle className="flex items-start gap-2">
-                        {habit.emoji && <span className="text-lg border-2 border-red-600">{habit.emoji}</span>}
+                        {habit.emoji && <span className="pb-2 text-lg border-2 border-red-600">{habit.emoji}</span>}
                         <span className="truncate text-sm font-semibold">{habit.habitName}</span>
                       </CardTitle>
                     </CardHeader>
