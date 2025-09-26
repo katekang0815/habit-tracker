@@ -487,7 +487,7 @@ const Profile = () => {
                 <Input
                   value={modalNotionUrl}
                   onChange={(e) => setModalNotionUrl(e.target.value)}
-                  placeholder="Enter your Notion URL"
+                  placeholder="Share your Notion URL to collaborate"
                   inputMode="url"
                   className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
                 />
@@ -501,7 +501,7 @@ const Profile = () => {
                 <Input
                   value={modalLinkedinUrl}
                   onChange={(e) => setModalLinkedinUrl(e.target.value)}
-                  placeholder="Enter your LinkedIn URL"
+                  placeholder="Share your LinkedIn URL to connect"
                   inputMode="url"
                   className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
                 />
