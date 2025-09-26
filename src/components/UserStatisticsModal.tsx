@@ -156,7 +156,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
         ) : userProfile ? (
           <div className="space-y-6">
             {/* User Header */}
-            <div className="bg-card rounded-lg p-6 shadow-sm">
+            <div className="border-2px border-t rounded-lg p-6 shadow-sm">
               <div className="flex items-center gap-4">
                 {/* Avatar with First Letter */}
                 <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-semibold">
@@ -211,7 +211,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
             ) : (
               <div className="grid grid-cols-2 gap-0.5">
                 {habitStats.map((habit, index) => (
-                  <Card key={habit.habitId} className="p-0 bg-card/50 backdrop-blur-sm border-border/50">
+                  <Card key={habit.habitId} className="p-0 pb-2 bg-card/50 backdrop-blur-sm border-border/50">
                     <CardHeader className="pb-0">
                       <CardTitle className="flex items-start gap-2">
                         {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
