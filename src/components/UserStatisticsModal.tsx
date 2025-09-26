@@ -213,9 +213,15 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
                 {habitStats.map((habit, index) => (
                   <Card key={habit.habitId} className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
                     <CardHeader className="pb-0">
-                      <CardTitle className="flex align-items items-start gap-2">
-                        {habit.emoji && <span className="text-lg border-2 border-red-600">{habit.emoji}</span>}
-                        <span className="truncate text-sm font-semibold">{habit.habitName}</span>
+                      <CardTitle className="flex items-center gap-2 leading-none">
+                        {habit.emoji && (
+                          <span className="inline-flex h-5 w-5 items-center justify-center text-lg leading-none">
+                            {habit.emoji}
+                          </span>
+                        )}
+                        <span className="truncate text-sm font-semibold leading-none">
+                          {habit.habitName}
+                        </span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6 pt-0">
