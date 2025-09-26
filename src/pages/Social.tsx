@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocialSharing } from "@/hooks/useSocialSharing";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,11 +6,14 @@ import { UserProfileCard } from "@/components/UserProfileCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { supabase } from "@/integrations/supabase/client";
+import UserStatisticsModal from "@/components/UserStatisticsModal";
 
 const Social = () => {
   const { user, loading: authLoading } = useAuth();
   const { sharedUsers, loading, fetchSharedUsers } = useSocialSharing();
   const navigate = useNavigate();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -21,7 +24,13 @@ const Social = () => {
   }, [user, authLoading, navigate]);
 
   const handleUserCardClick = (userId: string) => {
-    navigate(`/user/${userId}`);
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUserId(null);
   };
 
   const handleSignOut = async () => {
@@ -84,6 +93,12 @@ const Social = () => {
         onAddClick={handleAddClick}
         user={user}
         onSignOut={handleSignOut}
+      />
+
+      <UserStatisticsModal
+        userId={selectedUserId}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
       />
     </div>
   );
