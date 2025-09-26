@@ -186,12 +186,12 @@ const UserStatistics = () => {
             variant="outline"
             size="icon"
             onClick={goToPreviousMonth}
-            className="h-10 w-10"
+            className="h-8 w-8"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           
-          <h2 className="text-xl font-semibold text-center">
+          <h2 className="text-xl font-semibold text-foreground">
             {format(currentDate, 'MMMM yyyy')}
           </h2>
           
@@ -199,7 +199,7 @@ const UserStatistics = () => {
             variant="outline"
             size="icon"
             onClick={goToNextMonth}
-            className="h-10 w-10"
+            className="h-8 w-8"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -207,24 +207,24 @@ const UserStatistics = () => {
 
         {/* Statistics Grid */}
         {statsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }, (_, i) => (
               <div key={i} className="h-64 bg-muted rounded-lg animate-pulse"></div>
             ))}
           </div>
         ) : habitStats.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className=" col-span-2 text-center py-8">
             <CardContent>
               <p className="text-muted-foreground">No habit data available for this user in {format(currentDate, 'MMMM yyyy')}.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {habitStats.map((habit, index) => (
-              <Card key={habit.habitId} className="overflow-hidden">
+              <Card key={habit.habitId} className="p-3 bg-card/50 backdrop-blur-sm border-border/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    {habit.emoji && <span className="text-xl">{habit.emoji}</span>}
+                  <CardTitle className="flex items-start gap-2 mb-3">
+                    {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
                     <span className="truncate">{habit.habitName}</span>
                   </CardTitle>
                 </CardHeader>
