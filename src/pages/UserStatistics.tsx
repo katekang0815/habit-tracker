@@ -236,7 +236,7 @@ const UserStatistics = () => {
                 <CardContent className="p-6 pt-0">
                   {renderCalendarGrid(habit, index)}
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className={`pl-2 pb-2 text-xs font-semibold ${getHabitColor(index)}`}>
+                    <span className={`p-1 text-xs font-semibold ${getHabitColor(index)}`}>
                       {habit.completionPercentage}%
                     </span>
                   </div>
