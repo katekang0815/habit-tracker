@@ -128,7 +128,7 @@ const UserStatistics = () => {
             <div
               key={day}
                 className={`
-                p-0.5 h-6 w-6 flex items-center justify-center rounded-sm text-xs font-medium transition-all
+                p-0 h-6 w-6 flex items-center justify-center rounded-sm text-xs font-medium transition-all
                 ${isCompleted 
                   ? `${getHabitBackgroundColor(habitIndex)} text-white` 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
