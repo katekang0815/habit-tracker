@@ -123,9 +123,9 @@ const UserStatistics = () => {
             <div
               key={day}
               className={`
-                relative h-8 w-8 flex items-center justify-center rounded text-xs font-medium
+                p-1 h-7 w-7 flex items-center justify-center rounded-sm text-xs font-medium transition-all
                 ${isCompleted 
-                  ? `bg-current text-background ${habitColor}` 
+                  ? `bg-current text-background text-white ${habitColor}` 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }
               `}
@@ -225,16 +225,12 @@ const UserStatistics = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-start gap-2 mb-3">
                     {habit.emoji && <span className="text-lg">{habit.emoji}</span>}
-                    <span className="truncate">{habit.habitName}</span>
+                    <span className="truncate text-sm font-semibold">{habit.habitName}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {renderCalendarGrid(habit, getHabitColor(index))}
-                  
                   <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-sm text-muted-foreground">
-                      {habit.completedCount} days
-                    </span>
                     <span className={`text-sm font-semibold ${getHabitColor(index)}`}>
                       {habit.completionPercentage}%
                     </span>
