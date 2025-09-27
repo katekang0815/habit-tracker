@@ -52,13 +52,6 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
           {user.display_name || "Anonymous User"}
         </h3>
 
-        {/* Bio */}
-        {user.bio && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-            {user.bio}
-          </p>
-        )}
-
         {/* Social Media Links */}
         <div className="flex justify-center gap-2 mb-4">
             {user.linkedin && (
