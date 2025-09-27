@@ -121,7 +121,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
       const habitsWithStatus = habitsData.map((habit: Habit) => ({
         ...habit,
         completed: completionsMap.get(habit.id) || false,
-        can_toggle: !isPacificFutureDate(currentSelectedDate) && !isDateInVacation(currentSelectedDate),
+        can_toggle: habit.is_active && !isPacificFutureDate(currentSelectedDate) && !isDateInVacation(currentSelectedDate),
       }));
 
       setHabits(habitsWithStatus);

@@ -94,8 +94,8 @@ const SortableHabitItem = ({
   const handleToggleHabit = (id: string) => {
     const currentHabit = habit;
     
-    // Don't allow toggling if habit can't be toggled (not today or future date)
-    if (!currentHabit?.can_toggle) return;
+    // Don't allow toggling if habit can't be toggled (not today, future date, or inactive habit)
+    if (!currentHabit?.can_toggle || !currentHabit?.is_active) return;
     
     onToggleHabit(id);
   };
@@ -225,8 +225,8 @@ const HabitList = ({
   const handleToggleHabit = (id: string) => {
     const habit = habits.find(h => h.id === id);
     
-    // Don't allow toggling if habit can't be toggled (not today or future date)
-    if (!habit?.can_toggle) return;
+    // Don't allow toggling if habit can't be toggled (not today, future date, or inactive habit)
+    if (!habit?.can_toggle || !habit?.is_active) return;
     
     // If habit is being marked as complete, trigger animation
     if (habit && !habit.completed) {
