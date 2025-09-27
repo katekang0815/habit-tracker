@@ -89,10 +89,10 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // Placeholder for Facebook
+                onClick?.(user.user_id);
               }}
               className="w-8 h-8 rounded bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors font-bold text-sm"
-              title="Facebook (Coming Soon)"
+              title="View Statistics"
             >
               F
             </button>
