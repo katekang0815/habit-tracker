@@ -99,18 +99,6 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
           </div>
         )}
 
-        {/* Follow Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Placeholder for follow functionality
-          }}
-        >
-          Follow
-        </Button>
       </CardContent>
     </Card>
   );
