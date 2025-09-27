@@ -352,6 +352,20 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* Bio */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Bio
+            </label>
+            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent min-h-[100px] transition-all duration-200">
+              <p className="text-foreground leading-relaxed">
+                {bio || (
+                  <span className="text-muted-foreground italic">Say Hello ~ </span>
+                )}
+              </p>
+            </div>
+          </div>
+
           {/* Notion URL */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
