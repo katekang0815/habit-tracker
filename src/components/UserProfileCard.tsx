@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Linkedin } from "lucide-react";
 import { SharedUser } from "@/hooks/useSocialSharing";
 
 interface UserProfileCardProps {
@@ -56,6 +57,46 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
           <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
             {user.bio}
           </p>
+        )}
+
+        {/* Social Media Links */}
+        {(user.linkedin || user.notion_url) && (
+          <div className="flex justify-center gap-2 mb-4">
+            {user.linkedin && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(user.linkedin, '_blank');
+                }}
+                className="w-8 h-8 rounded bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
+                title="LinkedIn"
+              >
+                <Linkedin size={16} />
+              </button>
+            )}
+            {user.notion_url && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(user.notion_url, '_blank');
+                }}
+                className="w-8 h-8 rounded bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-colors font-bold text-sm"
+                title="Notion"
+              >
+                N
+              </button>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // Placeholder for Facebook
+              }}
+              className="w-8 h-8 rounded bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors font-bold text-sm"
+              title="Facebook (Coming Soon)"
+            >
+              F
+            </button>
+          </div>
         )}
 
         {/* Follow Button */}
