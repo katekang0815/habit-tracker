@@ -71,8 +71,8 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     { icon: Home, label: "Home", path: "/" },
     { icon: Plus, label: "Add", isAdd: true },
     { icon: BarChart3, label: "Stats", path: "/statistics" },
-    { icon: Users, label: "Social" },
     { icon: Pause, label: "Break", path: "/vacation" },
+    { icon: Users, label: "Social" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
