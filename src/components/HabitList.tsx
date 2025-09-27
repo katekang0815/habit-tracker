@@ -142,7 +142,7 @@ const SortableHabitItem = ({
               onClick={() => handleToggleHabit(habit.id)}
               disabled={!habit.can_toggle}
               className={`w-8 h-8 rounded-full border-2 border-border/50 bg-background/50 hover:bg-card transition-all duration-300 flex items-center justify-center relative ${
-                !habit.can_toggle ? 'cursor-not-allowed opacity-80' : ''
+                !habit.can_toggle ? 'cursor-not-allowed opacity-90' : ''
               }`}
             >
               {habit.completed && (
