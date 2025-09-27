@@ -382,7 +382,7 @@ const Profile = () => {
                   {notionUrl}
                 </a>
               ) : (
-                <span className="text-muted-foreground italic">Share your Notion URL</span>
+                <span className="text-muted-foreground italic">Share your Notion study workspace URL</span>
               )}
             </div>
           </div>
