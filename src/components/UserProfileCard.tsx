@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Linkedin, ChartColumn } from "lucide-react";
+import { Linkedin, ChartLine } from "lucide-react";
 import { SharedUser } from "@/hooks/useSocialSharing";
 
 interface UserProfileCardProps {
@@ -93,7 +93,7 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
               className="w-8 h-8 rounded bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
               title="View Activity"
             >
-              <ChartColumn size={16} />
+              <ChartLine size={16} />
             </button>
           </div>
 
