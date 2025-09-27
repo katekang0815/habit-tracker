@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, StarHalf, LuSparkle, MoreVertical, Trash2, Pause, Play, GripVertical } from "lucide-react";
+import { Check, StarHalf, Sparkle, MoreVertical, Trash2, Pause, Play, GripVertical } from "lucide-react";
 import { DeleteHabitDialog } from "@/components/DeleteHabitDialog";
 import {
   DndContext,
@@ -150,12 +150,12 @@ const SortableHabitItem = ({
               )}
             </button>
             
-            {/* LuSparkle animation */}
+            {/* Sparkle animation */}
             {animatingHabits.has(habit.id) && (
               <>
-                <LuSparkle className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
-                <LuSparkle className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
-                <LuSparkle className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
+                <Sparkle className="absolute -top-1 -right-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '0ms' }} />
+                <Sparkle className="absolute -bottom-1 -left-1 w-3 h-3 text-habit-complete animate-sparkle" style={{ animationDelay: '200ms' }} />
+                <Sparkle className="absolute top-0 -left-1 w-2 h-2 text-habit-complete animate-sparkle" style={{ animationDelay: '400ms' }} />
               </>
             )}
           </div>
