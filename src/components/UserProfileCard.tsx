@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Linkedin } from "lucide-react";
+import { Linkedin, Home } from "lucide-react";
 import { SharedUser } from "@/hooks/useSocialSharing";
 
 interface UserProfileCardProps {
@@ -91,10 +91,10 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
                 e.stopPropagation();
                 onClick?.(user.user_id);
               }}
-              className="w-8 h-8 rounded bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors font-bold text-sm"
+              className="w-8 h-8 rounded bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
               title="View Statistics"
             >
-              F
+              <Home size={16} />
             </button>
           </div>
         )}
