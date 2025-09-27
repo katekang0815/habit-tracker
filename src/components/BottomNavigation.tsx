@@ -1,4 +1,4 @@
-import { Home, Plus, BarChart3, Users, Pause, User, LogOut } from "lucide-react";
+import { Home, Plus, IoStatsChartSharp, Users, Pause, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -70,7 +70,7 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Plus, label: "Add", isAdd: true },
-    { icon: BarChart3, label: "Stats", path: "/statistics" },
+    { icon: IoStatsChartSharp, label: "Stats", path: "/statistics" },
     { icon: Pause, label: "Break", path: "/vacation" },
     { icon: Users, label: "Social" },
     { icon: User, label: "Profile", path: "/profile" },
