@@ -211,8 +211,8 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
             ) : (
               <div className="grid grid-cols-2 gap-0.5">
                 {habitStats.map((habit, index) => (
-                  <Card key={habit.habitId} className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
-                    <CardHeader className="pb-0">
+                  <Card key={habit.habitId} className="p-2 bg-card/50 backdrop-blur-sm border-border/50">
+                    <CardHeader className="p-0 pb-1">
                       <CardTitle className="flex items-center gap-2 leading-none">
                         {habit.emoji && (
                           <span className="inline-flex h-5 w-5 items-center justify-center text-lg leading-none">
@@ -224,10 +224,10 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
                         </span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6 pt-0">
+                    <CardContent className="p-1 pt-0">
                       {renderCalendarGrid(habit, index)}
-                      <div className="flex justify-between items-center pt-2 border-t">
-                        <span className={`p-1 text-xs font-semibold ${getHabitColor(index)}`}>
+                      <div className="flex justify-between items-center pt-1 border-t">
+                        <span className={`p-0.5 text-xs font-semibold ${getHabitColor(index)}`}>
                           {habit.completionPercentage}%
                         </span>
                       </div>
