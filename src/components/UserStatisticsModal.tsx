@@ -139,7 +139,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto p-4 m-0">
+      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto p-6 m-0">
         <DialogHeader>
           <DialogTitle></DialogTitle>
         </DialogHeader>
