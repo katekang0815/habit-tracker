@@ -5,9 +5,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Camera, Edit2, Share } from "lucide-react";
+import { Camera, Edit2, Share, Save, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -30,12 +29,8 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [initialData, setInitialData] = useState({ name: "", bio: "", notionUrl: "", linkedinUrl: "", avatarUrl: "" });
   
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalName, setModalName] = useState("");
-  const [modalBio, setModalBio] = useState("");
-  const [modalNotionUrl, setModalNotionUrl] = useState("");
-  const [modalLinkedinUrl, setModalLinkedinUrl] = useState("");
+  // Editing state
+  const [isEditing, setIsEditing] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -91,14 +86,6 @@ const Profile = () => {
 
   // enable/disable Save button
   const isDirty = useMemo(() => {
-    if (isModalOpen) {
-      return (
-        modalName !== name ||
-        modalBio !== bio ||
-        modalNotionUrl !== notionUrl ||
-        modalLinkedinUrl !== linkedinUrl
-      );
-    }
     return (
       name !== initialData.name ||
       bio !== initialData.bio ||
@@ -107,7 +94,7 @@ const Profile = () => {
       // If a preview exists, user changed avatar locally
       !!previewUrl
     );
-  }, [name, bio, notionUrl, linkedinUrl, previewUrl, initialData, isModalOpen, modalName, modalBio, modalNotionUrl, modalLinkedinUrl]);
+  }, [name, bio, notionUrl, linkedinUrl, previewUrl, initialData]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -178,14 +165,8 @@ const Profile = () => {
         }
       }
 
-      // Use modal values if modal is open, otherwise use current values
-      const saveData = isModalOpen ? {
-        display_name: modalName,
-        bio: modalBio,
-        notion_url: modalNotionUrl,
-        linkedin: modalLinkedinUrl,
-        avatar_url: newAvatarUrl,
-      } : {
+      // Use current values
+      const saveData = {
         display_name: name,
         bio: bio,
         notion_url: notionUrl,
@@ -205,24 +186,17 @@ const Profile = () => {
         return;
       }
 
-      // Step 5: Update state and close modal if open
-      if (isModalOpen) {
-        setName(modalName);
-        setBio(modalBio);
-        setNotionUrl(modalNotionUrl);
-        setLinkedinUrl(modalLinkedinUrl);
-        setIsModalOpen(false);
-      }
-      
+      // Step 5: Update state and exit editing mode
       setAvatarUrl(newAvatarUrl);
       const newInitialData = { 
-        name: isModalOpen ? modalName : name, 
-        bio: isModalOpen ? modalBio : bio, 
-        notionUrl: isModalOpen ? modalNotionUrl : notionUrl, 
-        linkedinUrl: isModalOpen ? modalLinkedinUrl : linkedinUrl,
+        name, 
+        bio, 
+        notionUrl, 
+        linkedinUrl,
         avatarUrl: newAvatarUrl 
       };
       setInitialData(newInitialData);
+      setIsEditing(false);
       setPreviewUrl("");
       setSelectedFile(null);
       
@@ -241,19 +215,29 @@ const Profile = () => {
   };
 
   const handleEditClick = () => {
-    setModalName(name);
-    setModalBio(bio);
-    setModalNotionUrl(notionUrl);
-    setModalLinkedinUrl(linkedinUrl);
-    setIsModalOpen(true);
+    setIsEditing(true);
   };
 
-  const handleModalCancel = () => {
-    setModalName(name);
-    setModalBio(bio);
-    setModalNotionUrl(notionUrl);
-    setModalLinkedinUrl(linkedinUrl);
-    setIsModalOpen(false);
+  const handleCancel = () => {
+    setName(initialData.name);
+    setBio(initialData.bio);
+    setNotionUrl(initialData.notionUrl);
+    setLinkedinUrl(initialData.linkedinUrl);
+    setIsEditing(false);
+    
+    // Reset avatar changes
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    await handleSaveAll();
   };
 
   // Handlers for BottomNavigation
@@ -302,8 +286,8 @@ const Profile = () => {
         </h1>
 
         {/* Profile Image */}
-        <div className="flex justify-center mb-12">
-          <div className="relative">
+        <div className="flex flex-col items-center mb-12">
+          <div className="relative mb-6">
             <Avatar className="w-24 h-24">
               <AvatarImage src={currentAvatarSrc} alt="Profile" />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-medium">
@@ -322,34 +306,88 @@ const Profile = () => {
             />
 
             {/* Trigger button */}
-            <Button
-              size="icon"
-              variant="outline"
-              className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background border-2"
-              type="button"
-              onClick={openFilePicker}
-              aria-label="Change avatar"
-              title="Change avatar"
-            >
-              <Camera className="w-4 h-4" />
-            </Button>
+            {isEditing && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-background border-2"
+                type="button"
+                onClick={openFilePicker}
+                aria-label="Change avatar"
+                title="Change avatar"
+              >
+                <Camera className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+
+          {/* Share Button - moved below avatar */}
+          <div className="w-full max-w-xs">
+            {!isSharing ? (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        await handleShare();
+                      }}
+                      disabled={shareLoading}
+                      type="button"
+                      className="w-full"
+                    >
+                      <Share className="w-4 h-4 mr-2" />
+                      {shareLoading ? "Updating..." : "Share"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">❤️</span>
+                      <p>Share your habit list to your Social page</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  await handleShare();
+                }}
+                disabled={shareLoading}
+                type="button"
+                className="w-full"
+              >
+                <Share className="w-4 h-4 mr-2" />
+                {shareLoading ? "Updating..." : "Unshare"}
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Fields Container - Read Only Display */}
+        {/* Fields Container - Editable/Display */}
         <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
           {/* Name */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Name
             </label>
-            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
-              <p className="text-foreground font-medium">
-                {name || (
-                  <span className="text-muted-foreground italic">Introduce your name!</span>
-                )}
-              </p>
-            </div>
+            {isEditing ? (
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+              />
+            ) : (
+              <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
+                <p className="text-foreground font-medium">
+                  {name || (
+                    <span className="text-muted-foreground italic">Introduce your name!</span>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Bio */}
@@ -357,13 +395,22 @@ const Profile = () => {
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Bio
             </label>
-            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent min-h-[100px] transition-all duration-200">
-              <p className="text-foreground leading-relaxed">
-                {bio || (
-                  <span className="text-muted-foreground italic">Say Hello ~ </span>
-                )}
-              </p>
-            </div>
+            {isEditing ? (
+              <Textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                className="min-h-[100px] resize-none border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+                placeholder="Say Hello ~"
+              />
+            ) : (
+              <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent min-h-[100px] transition-all duration-200">
+                <p className="text-foreground leading-relaxed">
+                  {bio || (
+                    <span className="text-muted-foreground italic">Say Hello ~ </span>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Notion URL */}
@@ -371,20 +418,30 @@ const Profile = () => {
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               NOTION URL
             </label>
-            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
-              {notionUrl ? (
-                <a 
-                  href={notionUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
-                >
-                  {notionUrl}
-                </a>
-              ) : (
-                <span className="text-muted-foreground italic">Share your Notion study workspace URL</span>
-              )}
-            </div>
+            {isEditing ? (
+              <Input
+                value={notionUrl}
+                onChange={(e) => setNotionUrl(e.target.value)}
+                placeholder="Share your Notion URL to collaborate"
+                inputMode="url"
+                className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+              />
+            ) : (
+              <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
+                {notionUrl ? (
+                  <a 
+                    href={notionUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
+                  >
+                    {notionUrl}
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground italic">Share your Notion study workspace URL</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* LinkedIn URL */}
@@ -392,152 +449,66 @@ const Profile = () => {
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               LINKEDIN
             </label>
-            <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
-              {linkedinUrl ? (
-                <a 
-                  href={linkedinUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
-                >
-                  {linkedinUrl}
-                </a>
-              ) : (
-                <span className="text-muted-foreground italic">Share your LinkedIn URL</span>
-              )}
-            </div>
+            {isEditing ? (
+              <Input
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                placeholder="Share your LinkedIn URL to connect"
+                inputMode="url"
+                className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
+              />
+            ) : (
+              <div className="bg-accent/50 rounded-lg px-4 py-3 border border-accent transition-all duration-200">
+                {linkedinUrl ? (
+                  <a 
+                    href={linkedinUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-primary hover:text-primary-glow transition-colors duration-200 font-medium break-all underline decoration-primary/30 hover:decoration-primary underline-offset-2"
+                  >
+                    {linkedinUrl}
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground italic">Share your LinkedIn URL</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-6 mb-8 grid grid-cols-2 gap-3">
-          {!isSharing ? (
-            <TooltipProvider delayDuration={0}>
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      await handleShare();
-                    }}
-                    disabled={shareLoading}
-                    type="button"
-                  >
-                    <Share className="w-4 h-4 mr-2" />
-                    {shareLoading ? "Updating..." : "Share"}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="p-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">❤️</span>
-                    <p>Share your habit list to your Social page</p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={async () => {
-                await handleShare();
-              }}
-              disabled={shareLoading}
-              type="button"
-            >
-              <Share className="w-4 h-4 mr-2" />
-              {shareLoading ? "Updating..." : "Unshare"}
-            </Button>
-          )}
-          <Button
-            onClick={handleEditClick}
-            type="button"
-          >
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Profile
-          </Button>
-        </div>
-
-        {/* Edit Profile Modal */}
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Edit Profile</DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-6">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  Name
-                </label>
-                <Input
-                  value={modalName}
-                  onChange={(e) => setModalName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-                />
-              </div>
-
-              {/* Bio */}
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  Bio
-                </label>
-                <Textarea
-                  value={modalBio}
-                  onChange={(e) => setModalBio(e.target.value)}
-                  className="min-h-[100px] resize-none border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-                  placeholder="Say Hello ~"
-                />
-              </div>
-
-              {/* Notion URL */}
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  Notion URL
-                </label>
-                <Input
-                  value={modalNotionUrl}
-                  onChange={(e) => setModalNotionUrl(e.target.value)}
-                  placeholder="Share your Notion URL to collaborate"
-                  inputMode="url"
-                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-                />
-              </div>
-
-              {/* LinkedIn URL */}
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-3">
-                  LinkedIn URL
-                </label>
-                <Input
-                  value={modalLinkedinUrl}
-                  onChange={(e) => setModalLinkedinUrl(e.target.value)}
-                  placeholder="Share your LinkedIn URL to connect"
-                  inputMode="url"
-                  className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-                />
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2">
+        <div className="mt-6 mb-8">
+          {isEditing ? (
+            <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                onClick={handleModalCancel}
+                onClick={handleCancel}
                 type="button"
               >
+                <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
               <Button
                 disabled={!isDirty || saving}
-                onClick={handleSaveAll}
+                onClick={handleSave}
                 type="button"
               >
+                <Save className="w-4 h-4 mr-2" />
                 {saving ? "Saving..." : "Save"}
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </div>
+          ) : (
+            <Button
+              onClick={handleEditClick}
+              type="button"
+              className="w-full"
+            >
+              <Edit2 className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Button>
+          )}
+        </div>
+
       </div>
 
       <BottomNavigation 
