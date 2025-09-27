@@ -60,8 +60,7 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
         )}
 
         {/* Social Media Links */}
-        {(user.linkedin || user.notion_url) && (
-          <div className="flex justify-center gap-2 mb-4">
+        <div className="flex justify-center gap-2 mb-4">
             {user.linkedin && (
               <button
                 onClick={(e) => {
@@ -97,7 +96,6 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
               <Home size={16} />
             </button>
           </div>
-        )}
 
       </CardContent>
     </Card>
