@@ -7,7 +7,7 @@ export interface SharedUser {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
-  bio: string | null;
+  target_role: string | null;
   linkedin: string | null;
   notion_url: string | null;
   shared_at: string;
@@ -57,7 +57,7 @@ export const useSocialSharing = () => {
       const userIds = data.map(item => item.user_id);
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, display_name, avatar_url, bio, linkedin, notion_url')
+        .select('user_id, display_name, avatar_url, target_role, linkedin, notion_url')
         .in('user_id', userIds);
 
       if (profilesError) throw profilesError;
@@ -68,7 +68,7 @@ export const useSocialSharing = () => {
           user_id: item.user_id,
           display_name: profile?.display_name || null,
           avatar_url: profile?.avatar_url || null,
-          bio: profile?.bio || null,
+          target_role: profile?.target_role || null,
           linkedin: profile?.linkedin || null,
           notion_url: profile?.notion_url || null,
           shared_at: item.created_at

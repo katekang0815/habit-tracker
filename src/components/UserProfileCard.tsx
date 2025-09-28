@@ -48,9 +48,20 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
         </div>
 
         {/* User Name */}
-        <h3 className="font-semibold text-foreground mb-3 truncate">
+        <h3 className="font-semibold text-foreground mb-2 truncate">
           {user.display_name || "Anonymous User"}
         </h3>
+        
+        {/* Target Role */}
+        <div className="mb-3 min-h-[1.25rem]">
+          {user.target_role ? (
+            <p className="text-sm text-muted-foreground truncate">
+              {user.target_role}
+            </p>
+          ) : (
+            <div className="h-5"></div>
+          )}
+        </div>
 
         {/* Social Media Links */}
         <div className="flex justify-center gap-2 mb-4">

@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 interface UserProfile {
   user_id: string;
   display_name: string;
-  bio?: string;
+  target_role?: string;
 }
 
 interface UserStatisticsModalProps {
@@ -43,7 +43,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
       setProfileLoading(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, display_name, bio')
+        .select('user_id, display_name, target_role')
         .eq('user_id', userId)
         .maybeSingle();
 

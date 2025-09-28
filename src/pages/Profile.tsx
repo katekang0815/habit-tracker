@@ -19,7 +19,7 @@ const Profile = () => {
   const { isSharing, toggleSharing, loading: shareLoading } = useSocialSharing();
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
+  const [targetRole, setTargetRole] = useState("");
   const [notionUrl, setNotionUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
@@ -27,7 +27,7 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [initialData, setInitialData] = useState({ name: "", bio: "", notionUrl: "", linkedinUrl: "", avatarUrl: "" });
+  const [initialData, setInitialData] = useState({ name: "", targetRole: "", notionUrl: "", linkedinUrl: "", avatarUrl: "" });
   
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -47,7 +47,7 @@ const Profile = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('display_name, bio, notion_url, linkedin, avatar_url')
+          .select('display_name, target_role, notion_url, linkedin, avatar_url')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -59,14 +59,14 @@ const Profile = () => {
         if (data) {
           const profileData = {
             name: data.display_name || "",
-            bio: data.bio || "",
+            targetRole: data.target_role || "",
             notionUrl: data.notion_url || "",
             linkedinUrl: data.linkedin || "",
             avatarUrl: data.avatar_url || ""
           };
           
           setName(profileData.name);
-          setBio(profileData.bio);
+          setTargetRole(profileData.targetRole);
           setNotionUrl(profileData.notionUrl);
           setLinkedinUrl(profileData.linkedinUrl);
           setAvatarUrl(profileData.avatarUrl);
@@ -86,13 +86,13 @@ const Profile = () => {
   const isDirty = useMemo(() => {
     return (
       name !== initialData.name ||
-      bio !== initialData.bio ||
+      targetRole !== initialData.targetRole ||
       notionUrl !== initialData.notionUrl ||
       linkedinUrl !== initialData.linkedinUrl ||
       // If a preview exists, user changed avatar locally
       !!previewUrl
     );
-  }, [name, bio, notionUrl, linkedinUrl, previewUrl, initialData]);
+  }, [name, targetRole, notionUrl, linkedinUrl, previewUrl, initialData]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -166,7 +166,7 @@ const Profile = () => {
       // Use current values
       const saveData = {
         display_name: name,
-        bio: bio,
+        target_role: targetRole,
         notion_url: notionUrl,
         linkedin: linkedinUrl,
         avatar_url: newAvatarUrl,
@@ -188,7 +188,7 @@ const Profile = () => {
       setAvatarUrl(newAvatarUrl);
       const newInitialData = { 
         name, 
-        bio, 
+        targetRole, 
         notionUrl, 
         linkedinUrl,
         avatarUrl: newAvatarUrl 
@@ -214,7 +214,7 @@ const Profile = () => {
 
   const handleCancel = () => {
     setName(initialData.name);
-    setBio(initialData.bio);
+    setTargetRole(initialData.targetRole);
     setNotionUrl(initialData.notionUrl);
     setLinkedinUrl(initialData.linkedinUrl);
     
@@ -371,16 +371,16 @@ const Profile = () => {
             />
           </div>
 
-          {/* Bio */}
+          {/* Target Role */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Bio
+              Target Role
             </label>
-            <Textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="min-h-[100px] resize-none border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
-              placeholder="Say Hello ~"
+            <Input
+              value={targetRole}
+              onChange={(e) => setTargetRole(e.target.value)}
+              placeholder="Enter your target role"
+              className="border border-gray-300 hover:border-2 hover:border-green-300 focus:border-2 focus:border-green-500 focus-visible:ring-2 focus-visible:ring-green-200 transition-all"
             />
           </div>
 
