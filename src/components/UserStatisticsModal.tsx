@@ -154,7 +154,7 @@ const UserStatisticsModal = ({ userId, isOpen, onClose }: UserStatisticsModalPro
             </div>
           </div>
         ) : userProfile ? (
-          <div className="">
+          <div className="space-y-6">
             {/* User Header */}
             <div className="border-b-2 border-slate-200  p-4 shadow-sm">
               <div className="flex items-center gap-4">
