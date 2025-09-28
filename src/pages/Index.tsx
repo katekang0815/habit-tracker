@@ -144,7 +144,7 @@ const Index = () => {
         ) : (
           <HabitList 
             key={currentDate.toISOString()}
-            habits={habits} 
+            habits={habits.slice(0, 8)} 
             onToggleHabit={toggleHabit}
             onDeleteHabit={deleteHabit}
             onPauseHabit={pauseHabit}

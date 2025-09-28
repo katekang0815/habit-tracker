@@ -147,8 +147,10 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit, existingHabits }: AddH
   const [habitName, setHabitName] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState<string>("");
 
+  const isAtLimit = existingHabits.length >= 8;
+
   const handleSave = () => {
-    if (habitName.trim()) {
+    if (habitName.trim() && !isAtLimit) {
       const finalEmoji = selectedEmoji || getAutoIcon(habitName.trim(), existingHabits);
       onAddHabit(habitName.trim(), finalEmoji);
       setHabitName("");
@@ -173,6 +175,14 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit, existingHabits }: AddH
         </DialogHeader>
         
         <div className="space-y-6 py-4">
+          {isAtLimit && (
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm text-destructive">
+                You've reached the maximum of 8 habits. Consider deleting unused habits to add new ones.
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-2">
             <Label htmlFor="habit-name" className="text-sm font-medium text-foreground">
               Habit Name
@@ -185,6 +195,7 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit, existingHabits }: AddH
               onKeyPress={handleKeyPress}
               className="bg-background/50 border-border/70 focus:border-primary"
               autoFocus
+              disabled={isAtLimit}
             />
           </div>
           
@@ -220,7 +231,7 @@ const AddHabitDialog = ({ open, onOpenChange, onAddHabit, existingHabits }: AddH
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!habitName.trim()}
+            disabled={!habitName.trim() || isAtLimit}
             className="flex-1 bg-primary hover:bg-primary-glow text-primary-foreground"
           >
             Save Habit
