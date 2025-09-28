@@ -312,6 +312,38 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     }
   };
 
+  const editHabit = async (habitId: string, name: string, emoji?: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from("habits")
+        .update({ name, emoji })
+        .eq("id", habitId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      toast({ title: "Success", description: "Habit updated successfully" });
+      fetchHabits();
+    } catch (error: any) {
+      console.error("Error editing habit:", error);
+      
+      // Check if it's a duplicate habit error
+      const isDuplicateError = error?.code === '23505' || 
+                              error?.message?.includes('duplicate') ||
+                              error?.message?.includes('unique constraint');
+      
+      toast({
+        title: "Error",
+        description: isDuplicateError 
+          ? "A habit with this name already exists" 
+          : "Failed to update habit",
+        variant: "destructive",
+      });
+    }
+  };
+
  useEffect(() => {
     // Clear habits immediately when date changes
     setHabits([]);
@@ -364,6 +396,7 @@ export const useHabits = (user: User | null, selectedDate: Date) => {
     habits,
     loading,
     addHabit,
+    editHabit,
     toggleHabit,
     deleteHabit,
     pauseHabit,

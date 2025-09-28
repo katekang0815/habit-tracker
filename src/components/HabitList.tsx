@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Check, StarHalf, Sparkle, MoreVertical, Trash2, Pause, Play, GripVertical } from "lucide-react";
+import { Check, StarHalf, Sparkle, MoreVertical, Trash2, Pause, Play, GripVertical, Edit2 } from "lucide-react";
 import { DeleteHabitDialog } from "@/components/DeleteHabitDialog";
+import { EditHabitDialog } from "@/components/EditHabitDialog";
 import {
   DndContext,
   closestCenter,
@@ -43,6 +44,7 @@ interface HabitListProps {
   onDeleteHabit: (id: string) => void;
   onPauseHabit: (id: string) => void;
   onActivateHabit: (id: string) => void;
+  onEditHabit: (habitId: string, name: string, emoji?: string) => void;
   onReorderHabits: (habitIds: string[]) => void;
   isVacationDate?: boolean;
   isHistoricalDate?: boolean;
@@ -59,6 +61,7 @@ interface SortableHabitItemProps {
   onPauseHabit: (id: string) => void;
   onActivateHabit: (id: string) => void;
   onOpenDeleteDialog: (habit: Habit) => void;
+  onOpenEditDialog: (habit: Habit) => void;
   isVacationDate: boolean;
   isHistoricalDate: boolean;
   canReorder: boolean;
@@ -73,6 +76,7 @@ const SortableHabitItem = ({
   onPauseHabit, 
   onActivateHabit, 
   onOpenDeleteDialog,
+  onOpenEditDialog,
   isVacationDate, 
   isHistoricalDate,
   canReorder 
@@ -168,6 +172,13 @@ const SortableHabitItem = ({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                  onClick={() => onOpenEditDialog(habit)}
+                  className="flex items-center gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </DropdownMenuItem>
                 {habit.is_active ? (
                   <DropdownMenuItem
                     onClick={() => onPauseHabit(habit.id)}
@@ -207,6 +218,7 @@ const HabitList = ({
   onDeleteHabit, 
   onPauseHabit, 
   onActivateHabit, 
+  onEditHabit,
   onReorderHabits, 
   isVacationDate = false, 
   isHistoricalDate = false,
@@ -215,6 +227,8 @@ const HabitList = ({
   const [animatingHabits, setAnimatingHabits] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -257,6 +271,16 @@ const HabitList = ({
     }
   };
 
+  const handleOpenEditDialog = (habit: Habit) => {
+    setHabitToEdit(habit);
+    setEditDialogOpen(true);
+  };
+
+  const handleConfirmEdit = (habitId: string, name: string, emoji?: string) => {
+    onEditHabit(habitId, name, emoji);
+    setHabitToEdit(null);
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -285,6 +309,7 @@ const HabitList = ({
               onPauseHabit={onPauseHabit}
               onActivateHabit={onActivateHabit}
               onOpenDeleteDialog={handleOpenDeleteDialog}
+              onOpenEditDialog={handleOpenEditDialog}
               isVacationDate={isVacationDate}
               isHistoricalDate={isHistoricalDate}
               canReorder={false}
@@ -297,6 +322,14 @@ const HabitList = ({
           onOpenChange={setDeleteDialogOpen}
           habitName={habitToDelete?.name || ""}
           onConfirm={handleConfirmDelete}
+        />
+        
+        <EditHabitDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          habit={habitToEdit}
+          onEditHabit={handleConfirmEdit}
+          existingHabits={habits}
         />
       </>
     );
@@ -322,6 +355,7 @@ const HabitList = ({
                 onPauseHabit={onPauseHabit}
                 onActivateHabit={onActivateHabit}
                 onOpenDeleteDialog={handleOpenDeleteDialog}
+                onOpenEditDialog={handleOpenEditDialog}
                 isVacationDate={isVacationDate}
                 isHistoricalDate={isHistoricalDate}
                 canReorder={canReorder}
@@ -336,6 +370,14 @@ const HabitList = ({
         onOpenChange={setDeleteDialogOpen}
         habitName={habitToDelete?.name || ""}
         onConfirm={handleConfirmDelete}
+      />
+        
+      <EditHabitDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        habit={habitToEdit}
+        onEditHabit={handleConfirmEdit}
+        existingHabits={habits}
       />
     </>
   );
