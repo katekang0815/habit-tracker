@@ -16,17 +16,33 @@ const Social = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authorizationChecked, setAuthorizationChecked] = useState(false);
 
+  // Separate useEffect for initial navigation
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/");
+    }
+  }, [authLoading, user, navigate]);
+
+  // Separate useEffect for authorization check
+  useEffect(() => {
+    if (!user || authLoading || authorizationChecked) {
       return;
     }
 
     const checkAuthAndFetch = async () => {
-      // Add a small delay to ensure database consistency
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Add delay to ensure database consistency and user state is ready
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      const isAuthorized = await checkUserAuthorization();
+      let isAuthorized = await checkUserAuthorization();
+      
+      // Retry logic - sometimes the first check fails due to timing
+      if (!isAuthorized) {
+        console.log('First authorization check failed, retrying...');
+        // Wait a bit more and retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+        isAuthorized = await checkUserAuthorization();
+      }
+      
       setAuthorizationChecked(true);
       
       if (!isAuthorized) {
@@ -38,17 +54,18 @@ const Social = () => {
           variant: "destructive",
         });
         
-        navigate("/profile");
+        setTimeout(() => {
+          navigate("/profile");
+        }, 100);
         return;
       }
       
+      // User is authorized, fetch shared users
       fetchSharedUsers();
     };
 
-    if (user && !authLoading) {
-      checkAuthAndFetch();
-    }
-  }, [user, authLoading, navigate, checkUserAuthorization, fetchSharedUsers]);
+    checkAuthAndFetch();
+  }, [user, authLoading, authorizationChecked, navigate, checkUserAuthorization, fetchSharedUsers]);
 
   const handleUserCardClick = (userId: string) => {
     setSelectedUserId(userId);

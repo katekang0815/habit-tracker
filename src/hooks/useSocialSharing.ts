@@ -129,26 +129,51 @@ export const useSocialSharing = () => {
 
   // Check if user has authorization (shared LinkedIn)
   const checkUserAuthorization = async () => {
-    if (!user) return false;
+    if (!user) {
+      console.log('checkUserAuthorization: No user found');
+      return false;
+    }
 
     try {
-      const { data } = await supabase
+      // First check if user has an active share status
+      const { data: shareData, error: shareError } = await supabase
         .from('social_shares')
         .select('is_active')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .maybeSingle();
 
-      if (!data) return false;
+      if (shareError) {
+        console.error('Error checking social_shares:', shareError);
+        return false;
+      }
 
-      // Check if user has LinkedIn in their profile
-      const { data: profile } = await supabase
+      if (!shareData) {
+        console.log('checkUserAuthorization: User is not sharing (no active record)');
+        return false;
+      }
+
+      // Then check if user has LinkedIn in their profile
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('linkedin')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      return !!profile?.linkedin?.trim();
+      if (profileError) {
+        console.error('Error checking profile:', profileError);
+        return false;
+      }
+
+      const hasLinkedIn = !!profile?.linkedin?.trim();
+      console.log('checkUserAuthorization:', {
+        userId: user.id,
+        isSharing: !!shareData,
+        hasLinkedIn,
+        authorized: !!shareData && hasLinkedIn
+      });
+
+      return hasLinkedIn;
     } catch (error) {
       console.error('Error checking authorization:', error);
       return false;
