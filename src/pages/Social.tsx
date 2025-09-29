@@ -25,27 +25,50 @@ const Social = () => {
 
   // Separate useEffect for authorization check
   useEffect(() => {
-    if (!user || authLoading || authorizationChecked) {
+    // Wait for auth to be fully loaded
+    if (authLoading) {
+      console.log('Social: Auth still loading, waiting...');
       return;
     }
 
+    // If no user after auth loaded, redirect to home
+    if (!user) {
+      console.log('Social: No user found after auth loaded');
+      navigate("/");
+      return;
+    }
+
+    // Don't check again if already checked
+    if (authorizationChecked) {
+      return;
+    }
+
+    console.log('Social: Starting authorization check for user:', user.id);
+
     const checkAuthAndFetch = async () => {
-      // Add delay to ensure database consistency and user state is ready
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Give a moment for any pending database operations
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       let isAuthorized = await checkUserAuthorization();
       
-      // Retry logic - sometimes the first check fails due to timing
+      // Retry logic with longer delay
       if (!isAuthorized) {
-        console.log('First authorization check failed, retrying...');
-        // Wait a bit more and retry
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('Social: First authorization check failed, retrying in 1 second...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        isAuthorized = await checkUserAuthorization();
+      }
+      
+      // Final retry with even longer delay
+      if (!isAuthorized) {
+        console.log('Social: Second authorization check failed, final retry in 1.5 seconds...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
         isAuthorized = await checkUserAuthorization();
       }
       
       setAuthorizationChecked(true);
       
       if (!isAuthorized) {
+        console.log('Social: Authorization failed after all retries');
         // Show a toast message explaining why they're being redirected
         const { toast } = await import("@/hooks/use-toast");
         toast({
@@ -60,6 +83,7 @@ const Social = () => {
         return;
       }
       
+      console.log('Social: User authorized, fetching shared users');
       // User is authorized, fetch shared users
       fetchSharedUsers();
     };

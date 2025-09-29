@@ -245,10 +245,12 @@ const Profile = () => {
     // Navigate to social page only if user just enabled sharing successfully
     // Check the result to determine if sharing was enabled (not disabled)
     if (result?.success && result?.wasSharing === false) {
-      // Add a small delay to ensure database is fully updated
+      // Wait longer to ensure database is fully updated and propagated
+      console.log('Profile: Share successful, waiting before navigation...');
       setTimeout(() => {
+        console.log('Profile: Navigating to social page');
         navigate('/social');
-      }, 100);
+      }, 1500); // Increased delay to match the retry delays in Social page
     }
   };
 
