@@ -241,10 +241,10 @@ const Profile = () => {
 
   const handleShare = async () => {
     const wasSharing = isSharing;
-    await toggleSharing();
+    const result = await toggleSharing();
     
-    // Navigate to social page only if user just enabled sharing
-    if (!wasSharing && !shareLoading) {
+    // Navigate to social page only if user just enabled sharing successfully
+    if (!wasSharing && result?.success) {
       navigate('/social');
     }
   };

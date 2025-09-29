@@ -10,18 +10,32 @@ import UserStatisticsModal from "@/components/UserStatisticsModal";
 
 const Social = () => {
   const { user, loading: authLoading } = useAuth();
-  const { sharedUsers, loading, fetchSharedUsers } = useSocialSharing();
+  const { sharedUsers, loading, fetchSharedUsers, checkUserAuthorization } = useSocialSharing();
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [authorizationChecked, setAuthorizationChecked] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/");
       return;
     }
-    fetchSharedUsers();
-  }, [user, authLoading, navigate]);
+
+    const checkAuthAndFetch = async () => {
+      const isAuthorized = await checkUserAuthorization();
+      setAuthorizationChecked(true);
+      
+      if (!isAuthorized) {
+        navigate("/profile");
+        return;
+      }
+      
+      fetchSharedUsers();
+    };
+
+    checkAuthAndFetch();
+  }, [user, authLoading, navigate, checkUserAuthorization, fetchSharedUsers]);
 
   const handleUserCardClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -42,7 +56,7 @@ const Social = () => {
     navigate("/");
   };
 
-  if (authLoading) {
+  if (authLoading || !authorizationChecked) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Skeleton className="h-8 w-32" />

@@ -38,7 +38,7 @@ export const useSocialSharing = () => {
     }
   };
 
-  // Fetch all users who have shared their profiles
+  // Fetch all users who have shared their profiles (only with LinkedIn)
   const fetchSharedUsers = async () => {
     setLoading(true);
     try {
@@ -53,27 +53,34 @@ export const useSocialSharing = () => {
 
       if (error) throw error;
 
-      // Get profile data for each user
+      // Get profile data for each user, only include users with LinkedIn
       const userIds = data.map(item => item.user_id);
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('user_id, display_name, avatar_url, target_role, linkedin, notion_url')
-        .in('user_id', userIds);
+        .in('user_id', userIds)
+        .not('linkedin', 'is', null)
+        .neq('linkedin', '');
 
       if (profilesError) throw profilesError;
 
-      const formattedUsers: SharedUser[] = data.map(item => {
-        const profile = profilesData?.find(p => p.user_id === item.user_id);
-        return {
-          user_id: item.user_id,
-          display_name: profile?.display_name || null,
-          avatar_url: profile?.avatar_url || null,
-          target_role: profile?.target_role || null,
-          linkedin: profile?.linkedin || null,
-          notion_url: profile?.notion_url || null,
-          shared_at: item.created_at
-        };
-      });
+      // Only include users who have LinkedIn URLs
+      const formattedUsers: SharedUser[] = data
+        .map(item => {
+          const profile = profilesData?.find(p => p.user_id === item.user_id);
+          if (!profile?.linkedin?.trim()) return null;
+          
+          return {
+            user_id: item.user_id,
+            display_name: profile?.display_name || null,
+            avatar_url: profile?.avatar_url || null,
+            target_role: profile?.target_role || null,
+            linkedin: profile?.linkedin || null,
+            notion_url: profile?.notion_url || null,
+            shared_at: item.created_at
+          };
+        })
+        .filter((user): user is SharedUser => user !== null);
 
       setSharedUsers(formattedUsers);
     } catch (error) {
@@ -88,9 +95,69 @@ export const useSocialSharing = () => {
     }
   };
 
+  // Validate profile for sharing
+  const validateProfileForSharing = async () => {
+    if (!user) return { isValid: false, error: "User not authenticated" };
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name, target_role, linkedin')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      const missingFields = [];
+      if (!data?.display_name?.trim()) missingFields.push("Name");
+      if (!data?.target_role?.trim()) missingFields.push("Target Role");
+      if (!data?.linkedin?.trim()) missingFields.push("LinkedIn URL");
+
+      if (missingFields.length > 0) {
+        const fieldText = missingFields.join(", ");
+        return { 
+          isValid: false, 
+          error: `Please complete your profile first. Missing: ${fieldText}` 
+        };
+      }
+
+      return { isValid: true, error: null };
+    } catch (error) {
+      return { isValid: false, error: "Failed to validate profile" };
+    }
+  };
+
+  // Check if user has authorization (shared LinkedIn)
+  const checkUserAuthorization = async () => {
+    if (!user) return false;
+
+    try {
+      const { data } = await supabase
+        .from('social_shares')
+        .select('is_active')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!data) return false;
+
+      // Check if user has LinkedIn in their profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('linkedin')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      return !!profile?.linkedin?.trim();
+    } catch (error) {
+      console.error('Error checking authorization:', error);
+      return false;
+    }
+  };
+
   // Toggle sharing status
   const toggleSharing = async () => {
-    if (!user) return;
+    if (!user) return { success: false, error: "User not authenticated" };
 
     setLoading(true);
     try {
@@ -111,7 +178,19 @@ export const useSocialSharing = () => {
           title: "Profile unshared",
           description: "Your profile is no longer visible to other users",
         });
+        return { success: true, error: null };
       } else {
+        // Validate profile before sharing
+        const validation = await validateProfileForSharing();
+        if (!validation.isValid) {
+          toast({
+            title: "Cannot share profile",
+            description: validation.error,
+            variant: "destructive",
+          });
+          return { success: false, error: validation.error };
+        }
+
         // Share - create or reactivate sharing with proper conflict resolution
         const { error } = await supabase
           .from('social_shares')
@@ -132,6 +211,7 @@ export const useSocialSharing = () => {
           title: "Profile shared!",
           description: "Your profile is now visible to other users",
         });
+        return { success: true, error: null };
       }
     } catch (error) {
       console.error('Error toggling sharing:', error);
@@ -140,6 +220,7 @@ export const useSocialSharing = () => {
         description: "Failed to update sharing status",
         variant: "destructive",
       });
+      return { success: false, error: "Failed to update sharing status" };
     } finally {
       setLoading(false);
     }
@@ -157,5 +238,7 @@ export const useSocialSharing = () => {
     loading,
     toggleSharing,
     fetchSharedUsers,
+    validateProfileForSharing,
+    checkUserAuthorization,
   };
 };
