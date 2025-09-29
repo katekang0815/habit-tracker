@@ -23,10 +23,21 @@ const Social = () => {
     }
 
     const checkAuthAndFetch = async () => {
+      // Add a small delay to ensure database consistency
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const isAuthorized = await checkUserAuthorization();
       setAuthorizationChecked(true);
       
       if (!isAuthorized) {
+        // Show a toast message explaining why they're being redirected
+        const { toast } = await import("@/hooks/use-toast");
+        toast({
+          title: "Access Denied",
+          description: "Please share your profile with LinkedIn URL to access the Social page",
+          variant: "destructive",
+        });
+        
         navigate("/profile");
         return;
       }
@@ -34,7 +45,9 @@ const Social = () => {
       fetchSharedUsers();
     };
 
-    checkAuthAndFetch();
+    if (user && !authLoading) {
+      checkAuthAndFetch();
+    }
   }, [user, authLoading, navigate, checkUserAuthorization, fetchSharedUsers]);
 
   const handleUserCardClick = (userId: string) => {

@@ -206,12 +206,17 @@ export const useSocialSharing = () => {
           throw error;
         }
 
-        setIsSharing(true);
+        // Add a small delay to ensure database commit
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Refresh sharing status from database to ensure consistency
+        await checkSharingStatus();
+        
         toast({
           title: "Profile shared!",
           description: "Your profile is now visible to other users",
         });
-        return { success: true, error: null };
+        return { success: true, error: null, wasSharing: false };
       }
     } catch (error) {
       console.error('Error toggling sharing:', error);

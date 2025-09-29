@@ -240,12 +240,15 @@ const Profile = () => {
   };
 
   const handleShare = async () => {
-    const wasSharing = isSharing;
     const result = await toggleSharing();
     
     // Navigate to social page only if user just enabled sharing successfully
-    if (!wasSharing && result?.success) {
-      navigate('/social');
+    // Check the result to determine if sharing was enabled (not disabled)
+    if (result?.success && result?.wasSharing === false) {
+      // Add a small delay to ensure database is fully updated
+      setTimeout(() => {
+        navigate('/social');
+      }, 100);
     }
   };
 
