@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSocialSharing } from "@/hooks/useSocialSharing";
 import { useAuth } from "@/hooks/useAuth";
 import { UserProfileCard } from "@/components/UserProfileCard";
@@ -12,6 +12,7 @@ const Social = () => {
   const { user, loading: authLoading } = useAuth();
   const { sharedUsers, loading, fetchSharedUsers, checkUserAuthorization } = useSocialSharing();
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authorizationChecked, setAuthorizationChecked] = useState(false);
@@ -44,6 +45,21 @@ const Social = () => {
     }
 
     console.log('Social: Starting authorization check for user:', user.id);
+
+    // Check if user just shared from Profile page
+    const navigationState = location.state as { justShared?: boolean; userId?: string; timestamp?: number } | null;
+    if (navigationState?.justShared && navigationState.userId === user.id) {
+      // User just shared their profile, skip database check
+      const timeSinceShare = Date.now() - (navigationState.timestamp || 0);
+      if (timeSinceShare < 10000) { // Within 10 seconds
+        console.log('Social: User just shared profile, skipping authorization check');
+        setAuthorizationChecked(true);
+        fetchSharedUsers();
+        // Clear the navigation state to prevent reuse
+        navigate(location.pathname, { replace: true });
+        return;
+      }
+    }
 
     const checkAuthAndFetch = async () => {
       // Give a moment for any pending database operations
@@ -89,7 +105,7 @@ const Social = () => {
     };
 
     checkAuthAndFetch();
-  }, [user, authLoading, authorizationChecked, navigate, checkUserAuthorization, fetchSharedUsers]);
+  }, [user, authLoading, authorizationChecked, navigate, checkUserAuthorization, fetchSharedUsers, location]);
 
   const handleUserCardClick = (userId: string) => {
     setSelectedUserId(userId);
