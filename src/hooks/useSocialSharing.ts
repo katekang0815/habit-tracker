@@ -25,27 +25,56 @@ export const useSocialSharing = () => {
   const getCachedSharingStatus = (userId: string) => {
     try {
       const cache = localStorage.getItem(SHARING_CACHE_KEY);
-      if (!cache) return null;
+      console.log('[CACHE] Getting cache for key:', SHARING_CACHE_KEY);
+      console.log('[CACHE] Raw cache value:', cache);
+      
+      if (!cache) {
+        console.log('[CACHE] No cache found');
+        return null;
+      }
+      
       const parsed = JSON.parse(cache);
+      console.log('[CACHE] Parsed cache:', parsed);
+      
       // Check if cache is for current user and not expired (24 hours)
-      if (parsed.userId === userId && Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+      const isCorrectUser = parsed.userId === userId;
+      const cacheAge = Date.now() - parsed.timestamp;
+      const isExpired = cacheAge >= 24 * 60 * 60 * 1000;
+      
+      console.log('[CACHE] Cache validation:');
+      console.log('- Correct user:', isCorrectUser, `(${parsed.userId} === ${userId})`);
+      console.log('- Cache age (ms):', cacheAge);
+      console.log('- Is expired:', isExpired);
+      
+      if (isCorrectUser && !isExpired) {
+        console.log('[CACHE] Valid cache found, returning:', parsed.isSharing);
         return parsed.isSharing;
       }
+      
+      console.log('[CACHE] Cache invalid or expired');
       return null;
-    } catch {
+    } catch (error) {
+      console.error('[CACHE] Error reading cache:', error);
       return null;
     }
   };
 
   const setCachedSharingStatus = (userId: string, isSharing: boolean) => {
     try {
-      localStorage.setItem(SHARING_CACHE_KEY, JSON.stringify({
+      const cacheData = {
         userId,
         isSharing,
         timestamp: Date.now()
-      }));
+      };
+      console.log('[CACHE] Setting cache:', cacheData);
+      localStorage.setItem(SHARING_CACHE_KEY, JSON.stringify(cacheData));
+      console.log('[CACHE] Cache set successfully');
+      
+      // Verify it was saved
+      const verification = localStorage.getItem(SHARING_CACHE_KEY);
+      console.log('[CACHE] Verification read:', verification);
     } catch (error) {
-      console.error('Error caching sharing status:', error);
+      console.error('[CACHE] Error setting cache:', error);
     }
   };
 
@@ -172,14 +201,22 @@ export const useSocialSharing = () => {
       return false;
     }
 
-    console.log('checkUserAuthorization: Starting check for user:', user.id);
+    console.log('=== AUTHORIZATION CHECK START ===');
+    console.log('User ID:', user.id);
+    console.log('Timestamp:', new Date().toISOString());
 
     // Check cache first
+    console.log('Checking localStorage cache...');
     const cachedStatus = getCachedSharingStatus(user.id);
+    console.log('Cache result:', cachedStatus);
+    console.log('Cache raw data:', localStorage.getItem(SHARING_CACHE_KEY));
+    
     if (cachedStatus === true) {
-      console.log('checkUserAuthorization: Found valid cache, user is authorized');
+      console.log('✅ CACHE HIT: User is authorized via cache');
       return true;
     }
+    
+    console.log('Cache miss or invalid, checking database...');
 
     try {
       // Get both social_shares and profile data in one go
@@ -196,18 +233,17 @@ export const useSocialSharing = () => {
           .maybeSingle()
       ]);
 
-      console.log('checkUserAuthorization: Query results', {
-        shareResult,
-        profileResult
-      });
+      console.log('Database query results:');
+      console.log('- social_shares result:', JSON.stringify(shareResult, null, 2));
+      console.log('- profiles result:', JSON.stringify(profileResult, null, 2));
 
       if (shareResult.error) {
-        console.error('Error checking social_shares:', shareResult.error);
+        console.error('❌ Error checking social_shares:', shareResult.error);
         return false;
       }
 
       if (profileResult.error) {
-        console.error('Error checking profile:', profileResult.error);
+        console.error('❌ Error checking profile:', profileResult.error);
         return false;
       }
 
@@ -215,24 +251,31 @@ export const useSocialSharing = () => {
       const isActiveShare = shareResult.data?.is_active === true;
       const hasLinkedIn = !!profileResult.data?.linkedin?.trim();
 
-      console.log('checkUserAuthorization: Authorization details', {
-        userId: user.id,
-        isActiveShare,
-        hasLinkedIn,
-        linkedinValue: profileResult.data?.linkedin,
-        authorized: isActiveShare && hasLinkedIn
-      });
+      console.log('Authorization calculation:');
+      console.log('- is_active from social_shares:', shareResult.data?.is_active);
+      console.log('- isActiveShare (boolean):', isActiveShare);
+      console.log('- linkedin from profile:', profileResult.data?.linkedin);
+      console.log('- hasLinkedIn (boolean):', hasLinkedIn);
+      console.log('- Final authorized:', isActiveShare && hasLinkedIn);
 
       const isAuthorized = isActiveShare && hasLinkedIn;
       
       // Cache the result if user is authorized
       if (isAuthorized) {
+        console.log('Setting cache for authorized user');
         setCachedSharingStatus(user.id, true);
+      } else {
+        console.log('❌ User NOT authorized');
+        console.log('Missing requirements:', {
+          needsActiveShare: !isActiveShare,
+          needsLinkedIn: !hasLinkedIn
+        });
       }
 
+      console.log('=== AUTHORIZATION CHECK END ===');
       return isAuthorized;
     } catch (error) {
-      console.error('Error checking authorization:', error);
+      console.error('❌ Exception during authorization check:', error);
       return false;
     }
   };

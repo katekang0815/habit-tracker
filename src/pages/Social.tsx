@@ -24,27 +24,28 @@ const Social = () => {
     }
   }, [authLoading, user, navigate]);
 
-  // Separate useEffect for authorization check
+  // Separate useEffect for authorization check with proper guards
   useEffect(() => {
-    // Wait for auth to be fully loaded
+    // Guard 1: Skip if auth is loading
     if (authLoading) {
-      console.log('Social: Auth still loading, waiting...');
+      console.log('Social: Auth is loading, skipping authorization check');
       return;
     }
 
-    // If no user after auth loaded, redirect to home
+    // Guard 2: Skip if no user (but only redirect after auth is done)
     if (!user) {
-      console.log('Social: No user found after auth loaded');
+      console.log('Social: No authenticated user found');
       navigate("/");
       return;
     }
 
-    // Don't check again if already checked
+    // Guard 3: Skip if already checked
     if (authorizationChecked) {
+      console.log('Social: Authorization already checked');
       return;
     }
 
-    console.log('Social: Starting authorization check for user:', user.id);
+    console.log('Social: All guards passed, starting authorization for user:', user.id);
 
     // Check if user just shared from Profile page
     const navigationState = location.state as { justShared?: boolean; userId?: string; timestamp?: number } | null;
@@ -62,48 +63,61 @@ const Social = () => {
     }
 
     const checkAuthAndFetch = async () => {
-      // Give a moment for any pending database operations
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Double-check user is still available (defensive programming)
+      if (!user) {
+        console.warn('Social: User became null during async operation');
+        return;
+      }
+
+      // Give database a moment to catch up
+      await new Promise(resolve => setTimeout(resolve, 300));
       
+      console.log('Social: Checking authorization...');
       let isAuthorized = await checkUserAuthorization();
       
-      // Retry logic with longer delay
-      if (!isAuthorized) {
-        console.log('Social: First authorization check failed, retrying in 1 second...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      // If not authorized, try a few more times with delays
+      const retryDelays = [1000, 1500, 2000];
+      let retryCount = 0;
+      
+      while (!isAuthorized && retryCount < retryDelays.length) {
+        console.log(`Social: Authorization attempt ${retryCount + 2} failed, retrying in ${retryDelays[retryCount]}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelays[retryCount]));
+        
+        // Ensure user still exists before retry
+        if (!user) {
+          console.warn('Social: User became null during retry');
+          return;
+        }
+        
         isAuthorized = await checkUserAuthorization();
+        retryCount++;
       }
       
-      // Final retry with even longer delay
-      if (!isAuthorized) {
-        console.log('Social: Second authorization check failed, final retry in 1.5 seconds...');
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        isAuthorized = await checkUserAuthorization();
-      }
-      
+      // Mark as checked regardless of outcome
       setAuthorizationChecked(true);
       
       if (!isAuthorized) {
-        console.log('Social: Authorization failed after all retries');
-        // Show a toast message explaining why they're being redirected
-        const { toast } = await import("@/hooks/use-toast");
-        toast({
-          title: "Access Denied",
-          description: "Please share your profile with LinkedIn URL to access the Social page",
-          variant: "destructive",
+        console.log('Social: Authorization failed after all attempts');
+        // Import toast dynamically to avoid issues
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({
+            title: "Access Denied",
+            description: "Please share your profile with LinkedIn URL to access the Social page",
+            variant: "destructive",
+          });
         });
         
+        // Small delay before redirect for UX
         setTimeout(() => {
           navigate("/profile");
-        }, 100);
-        return;
+        }, 500);
+      } else {
+        console.log('Social: User authorized successfully');
+        fetchSharedUsers();
       }
-      
-      console.log('Social: User authorized, fetching shared users');
-      // User is authorized, fetch shared users
-      fetchSharedUsers();
     };
 
+    // Execute the check
     checkAuthAndFetch();
   }, [user, authLoading, authorizationChecked, navigate, checkUserAuthorization, fetchSharedUsers, location]);
 
