@@ -259,6 +259,13 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     try {
+      // Clear sharing cache before signing out
+      try {
+        localStorage.removeItem('habit-tracker-sharing-status');
+      } catch {
+        // Ignore cache clearing errors
+      }
+      
       await supabase.auth.signOut();
       toast.success("Signed out successfully");
     } catch (error) {

@@ -19,6 +19,44 @@ export const useSocialSharing = () => {
   const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Helper function to manage sharing status cache
+  const SHARING_CACHE_KEY = 'habit-tracker-sharing-status';
+  
+  const getCachedSharingStatus = (userId: string) => {
+    try {
+      const cache = localStorage.getItem(SHARING_CACHE_KEY);
+      if (!cache) return null;
+      const parsed = JSON.parse(cache);
+      // Check if cache is for current user and not expired (24 hours)
+      if (parsed.userId === userId && Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+        return parsed.isSharing;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const setCachedSharingStatus = (userId: string, isSharing: boolean) => {
+    try {
+      localStorage.setItem(SHARING_CACHE_KEY, JSON.stringify({
+        userId,
+        isSharing,
+        timestamp: Date.now()
+      }));
+    } catch (error) {
+      console.error('Error caching sharing status:', error);
+    }
+  };
+
+  const clearSharingCache = () => {
+    try {
+      localStorage.removeItem(SHARING_CACHE_KEY);
+    } catch (error) {
+      console.error('Error clearing sharing cache:', error);
+    }
+  };
+
   // Check if current user is sharing
   const checkSharingStatus = async () => {
     if (!user) return;
@@ -136,6 +174,13 @@ export const useSocialSharing = () => {
 
     console.log('checkUserAuthorization: Starting check for user:', user.id);
 
+    // Check cache first
+    const cachedStatus = getCachedSharingStatus(user.id);
+    if (cachedStatus === true) {
+      console.log('checkUserAuthorization: Found valid cache, user is authorized');
+      return true;
+    }
+
     try {
       // Get both social_shares and profile data in one go
       const [shareResult, profileResult] = await Promise.all([
@@ -178,7 +223,14 @@ export const useSocialSharing = () => {
         authorized: isActiveShare && hasLinkedIn
       });
 
-      return isActiveShare && hasLinkedIn;
+      const isAuthorized = isActiveShare && hasLinkedIn;
+      
+      // Cache the result if user is authorized
+      if (isAuthorized) {
+        setCachedSharingStatus(user.id, true);
+      }
+
+      return isAuthorized;
     } catch (error) {
       console.error('Error checking authorization:', error);
       return false;
@@ -204,6 +256,8 @@ export const useSocialSharing = () => {
         }
 
         setIsSharing(false);
+        // Clear cache when unsharing
+        clearSharingCache();
         toast({
           title: "Profile unshared",
           description: "Your profile is no longer visible to other users",
@@ -241,6 +295,9 @@ export const useSocialSharing = () => {
         
         // Refresh sharing status from database to ensure consistency
         await checkSharingStatus();
+        
+        // Cache the sharing status
+        setCachedSharingStatus(user.id, true);
         
         toast({
           title: "Profile shared!",
