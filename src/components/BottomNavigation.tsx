@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BottomNavigationProps {
   onAddClick: () => void;
@@ -57,12 +58,50 @@ const BottomNavigation = ({ onAddClick, user, onSignOut }: BottomNavigationProps
     }
   };
 
-  const handleSocialClick = () => {
-    if (user) {
-      navigate("/social");
-    } else {
+  const handleSocialClick = async () => {
+    if (!user) {
       toast({
         description: "Please sign in to collaborate"
+      });
+      return;
+    }
+
+    // Check authorization before navigation
+    try {
+      const { data: socialShare, error: socialError } = await supabase
+        .from('social_shares')
+        .select('is_active')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (socialError || !socialShare) {
+        toast({
+          description: "Please share your profile first to access the social page"
+        });
+        return;
+      }
+
+      // Additional check for LinkedIn URL
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('linkedin')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError || !profile?.linkedin) {
+        toast({
+          description: "Please add your LinkedIn URL to your profile first"
+        });
+        return;
+      }
+
+      // If all checks pass, navigate to social page
+      navigate("/social");
+    } catch (error) {
+      console.error('Authorization check failed:', error);
+      toast({
+        description: "Unable to access social page. Please try again."
       });
     }
   };
