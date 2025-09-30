@@ -40,12 +40,16 @@ export const useHabitStatistics = (user: User | null, currentDate: Date, targetU
       // Use targetUserId if provided, otherwise use current user's id
       const userId = targetUserId || user.id;
       
+      // Calculate end of month in Pacific timezone, then convert to end of day for proper UTC comparison
+      // This ensures habits created on the last day of the month in Pacific time are included
+      const monthEndPacific = new Date(pacificDate.getFullYear(), pacificDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
         .from('habits')
         .select('id, name, emoji, created_at')
         .eq('user_id', userId)
-        .lte('created_at', formatPacificDateString(monthEnd))
+        .lte('created_at', monthEndPacific.toISOString())
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
