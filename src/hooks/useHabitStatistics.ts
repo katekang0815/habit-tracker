@@ -40,9 +40,14 @@ export const useHabitStatistics = (user: User | null, currentDate: Date, targetU
       // Use targetUserId if provided, otherwise use current user's id
       const userId = targetUserId || user.id;
       
-      // Calculate end of month in Pacific timezone, then convert to end of day for proper UTC comparison
-      // This ensures habits created on the last day of the month in Pacific time are included
-      const monthEndPacific = new Date(pacificDate.getFullYear(), pacificDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      // Calculate end of month in Pacific timezone properly
+      // Create end of month date at 23:59:59 Pacific time, then convert to UTC for database comparison
+      const monthEndPacificTime = new Date(monthEnd.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+      monthEndPacificTime.setHours(23, 59, 59, 999);
+      
+      // Convert back to UTC by getting the offset and adjusting
+      const pacificOffset = monthEndPacificTime.getTimezoneOffset();
+      const monthEndPacific = new Date(monthEndPacificTime.getTime() - (pacificOffset * 60000));
       
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
