@@ -94,7 +94,7 @@ const Index = () => {
  
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
       <div className="max-w-xl mx-auto">
         {/* Header */}
         <div className="px-4 pt-8 pb-4">
