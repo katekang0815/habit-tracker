@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfMonth, endOfMonth, getDaysInMonth } from "date-fns";
-import { formatPacificDateString, toPacificDate, isPacificToday } from "@/lib/pacific-time";
+import { formatPacificDateString, toPacificDate, isPacificToday, getPacificMonthEndUTC } from "@/lib/pacific-time";
 import type { User } from "@supabase/supabase-js";
 
 export interface HabitStatistic {
@@ -40,21 +40,23 @@ export const useHabitStatistics = (user: User | null, currentDate: Date, targetU
       // Use targetUserId if provided, otherwise use current user's id
       const userId = targetUserId || user.id;
       
-      // Calculate end of month in Pacific timezone properly
-      // Create end of month date at 23:59:59 Pacific time, then convert to UTC for database comparison
-      const monthEndPacificTime = new Date(monthEnd.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
-      monthEndPacificTime.setHours(23, 59, 59, 999);
+      // Calculate end of month in Pacific timezone properly using our utility function
+      const monthEndPacificISO = getPacificMonthEndUTC(pacificDate.getFullYear(), pacificDate.getMonth());
       
-      // Convert back to UTC by getting the offset and adjusting
-      const pacificOffset = monthEndPacificTime.getTimezoneOffset();
-      const monthEndPacific = new Date(monthEndPacificTime.getTime() - (pacificOffset * 60000));
+      console.log('Debug: Month boundaries for statistics', {
+        monthStart: formatPacificDateString(monthStart),
+        monthEnd: formatPacificDateString(monthEnd),
+        monthEndPacificISO,
+        pacificDate: pacificDate.toISOString(),
+        selectedMonth: `${pacificDate.getFullYear()}-${String(pacificDate.getMonth() + 1).padStart(2, '0')}`
+      });
       
       // Fetch habits that were created before or during the selected month
       const { data: habitsData, error: habitsError } = await supabase
         .from('habits')
         .select('id, name, emoji, created_at')
         .eq('user_id', userId)
-        .lte('created_at', monthEndPacific.toISOString())
+        .lte('created_at', monthEndPacificISO)
         .order('created_at', { ascending: true });
 
       if (habitsError) throw habitsError;
