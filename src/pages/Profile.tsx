@@ -228,7 +228,7 @@ const Profile = () => {
           className="
             rounded-2xl border border-border bg-card/70
             shadow-sm ring-1 ring-black/5
-            p-6 sm:p-7
+            p-10 sm:p-7
           "
         >
           {/* Profile Image + Share */}
