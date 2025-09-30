@@ -16,6 +16,7 @@ const Social = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authorizationChecked, setAuthorizationChecked] = useState(false);
+  const [checkingInProgress, setCheckingInProgress] = useState(false);
 
   // Separate useEffect for initial navigation
   useEffect(() => {
@@ -35,17 +36,23 @@ const Social = () => {
     // Guard 2: Skip if no user (but only redirect after auth is done)
     if (!user) {
       console.log('Social: No authenticated user found');
-      navigate("/");
+      // Only navigate if we're sure auth has loaded and there's no user
+      if (!authLoading) {
+        navigate("/");
+      }
       return;
     }
 
-    // Guard 3: Skip if already checked
-    if (authorizationChecked) {
-      console.log('Social: Authorization already checked');
+    // Guard 3: Skip if already checked OR checking is in progress
+    if (authorizationChecked || checkingInProgress) {
+      console.log('Social: Authorization already checked or in progress');
       return;
     }
 
     console.log('Social: All guards passed, starting authorization for user:', user.id);
+
+    // Mark as checking in progress immediately
+    setCheckingInProgress(true);
 
     // Check if user just shared from Profile page
     const navigationState = location.state as { justShared?: boolean; userId?: string; timestamp?: number } | null;
@@ -55,6 +62,7 @@ const Social = () => {
       if (timeSinceShare < 10000) { // Within 10 seconds
         console.log('Social: User just shared profile, skipping authorization check');
         setAuthorizationChecked(true);
+        setCheckingInProgress(false);
         fetchSharedUsers();
         // Clear the navigation state to prevent reuse
         navigate(location.pathname, { replace: true });
@@ -63,63 +71,74 @@ const Social = () => {
     }
 
     const checkAuthAndFetch = async () => {
-      // Double-check user is still available (defensive programming)
-      if (!user) {
-        console.warn('Social: User became null during async operation');
+      // Store user ID to prevent issues if user becomes null
+      const currentUserId = user?.id;
+      if (!currentUserId) {
+        console.warn('Social: No user ID available');
+        setCheckingInProgress(false);
         return;
       }
 
-      // Give database a moment to catch up
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      console.log('Social: Checking authorization...');
-      let isAuthorized = await checkUserAuthorization();
-      
-      // If not authorized, try a few more times with delays
-      const retryDelays = [1000, 1500, 2000];
-      let retryCount = 0;
-      
-      while (!isAuthorized && retryCount < retryDelays.length) {
-        console.log(`Social: Authorization attempt ${retryCount + 2} failed, retrying in ${retryDelays[retryCount]}ms...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelays[retryCount]));
+      try {
+        // Give database a moment to catch up
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Ensure user still exists before retry
-        if (!user) {
-          console.warn('Social: User became null during retry');
-          return;
+        console.log('Social: Checking authorization for user:', currentUserId);
+        let isAuthorized = await checkUserAuthorization(user);
+        
+        // If not authorized, try a few more times with delays
+        const retryDelays = [1000, 1500, 2000];
+        let retryCount = 0;
+        
+        while (!isAuthorized && retryCount < retryDelays.length) {
+          console.log(`Social: Authorization attempt ${retryCount + 2} failed, retrying in ${retryDelays[retryCount]}ms...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelays[retryCount]));
+          
+          // Check if component is still mounted and user exists
+          if (!user || user.id !== currentUserId) {
+            console.warn('Social: User changed or became null during retry');
+            setCheckingInProgress(false);
+            return;
+          }
+          
+          isAuthorized = await checkUserAuthorization(user);
+          retryCount++;
         }
         
-        isAuthorized = await checkUserAuthorization();
-        retryCount++;
-      }
-      
-      // Mark as checked regardless of outcome
-      setAuthorizationChecked(true);
-      
-      if (!isAuthorized) {
-        console.log('Social: Authorization failed after all attempts');
-        // Import toast dynamically to avoid issues
-        import("@/hooks/use-toast").then(({ toast }) => {
-          toast({
-            title: "Access Denied",
-            description: "Please share your profile with LinkedIn URL to access the Social page",
-            variant: "destructive",
-          });
-        });
-        
-        // Small delay before redirect for UX
-        setTimeout(() => {
-          navigate("/profile");
-        }, 500);
-      } else {
-        console.log('Social: User authorized successfully');
-        fetchSharedUsers();
+        // Only update state if user hasn't changed
+        if (user && user.id === currentUserId) {
+          setAuthorizationChecked(true);
+          setCheckingInProgress(false);
+          
+          if (!isAuthorized) {
+            console.log('Social: Authorization failed after all attempts');
+            // Import toast dynamically to avoid issues
+            import("@/hooks/use-toast").then(({ toast }) => {
+              toast({
+                title: "Access Denied",
+                description: "Please share your profile with LinkedIn URL to access the Social page",
+                variant: "destructive",
+              });
+            });
+            
+            // Small delay before redirect for UX
+            setTimeout(() => {
+              navigate("/profile");
+            }, 500);
+          } else {
+            console.log('Social: User authorized successfully');
+            fetchSharedUsers();
+          }
+        }
+      } catch (error) {
+        console.error('Social: Error during authorization check:', error);
+        setCheckingInProgress(false);
       }
     };
 
     // Execute the check
     checkAuthAndFetch();
-  }, [user, authLoading, authorizationChecked, navigate, checkUserAuthorization, fetchSharedUsers, location]);
+  }, [user, authLoading, authorizationChecked, checkingInProgress, navigate, checkUserAuthorization, fetchSharedUsers, location]);
 
   const handleUserCardClick = (userId: string) => {
     setSelectedUserId(userId);

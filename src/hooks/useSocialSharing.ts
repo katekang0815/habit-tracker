@@ -195,19 +195,22 @@ export const useSocialSharing = () => {
   };
 
   // Check if user has authorization (shared LinkedIn)
-  const checkUserAuthorization = async () => {
-    if (!user) {
+  const checkUserAuthorization = async (userToCheck?: { id: string } | null) => {
+    // Use passed user or fall back to hook user
+    const currentUser = userToCheck || user;
+    
+    if (!currentUser) {
       console.log('checkUserAuthorization: No user found');
       return false;
     }
 
     console.log('=== AUTHORIZATION CHECK START ===');
-    console.log('User ID:', user.id);
+    console.log('User ID:', currentUser.id);
     console.log('Timestamp:', new Date().toISOString());
 
     // Check cache first
     console.log('Checking localStorage cache...');
-    const cachedStatus = getCachedSharingStatus(user.id);
+    const cachedStatus = getCachedSharingStatus(currentUser.id);
     console.log('Cache result:', cachedStatus);
     console.log('Cache raw data:', localStorage.getItem(SHARING_CACHE_KEY));
     
@@ -224,12 +227,12 @@ export const useSocialSharing = () => {
         supabase
           .from('social_shares')
           .select('is_active')
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser.id)
           .maybeSingle(),
         supabase
           .from('profiles')
           .select('linkedin')
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser.id)
           .maybeSingle()
       ]);
 
@@ -263,7 +266,7 @@ export const useSocialSharing = () => {
       // Cache the result if user is authorized
       if (isAuthorized) {
         console.log('Setting cache for authorized user');
-        setCachedSharingStatus(user.id, true);
+        setCachedSharingStatus(currentUser.id, true);
       } else {
         console.log('❌ User NOT authorized');
         console.log('Missing requirements:', {
