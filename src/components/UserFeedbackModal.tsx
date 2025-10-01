@@ -22,12 +22,31 @@ export const UserFeedbackModal = ({ open, onOpenChange }: UserFeedbackModalProps
       return;
     }
 
+    // Character limits for security
+    if (subject.length > 200) {
+      toast.error("Subject must be less than 200 characters");
+      return;
+    }
+
+    if (message.length > 2000) {
+      toast.error("Message must be less than 2000 characters");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("You must be logged in to submit feedback");
+        return;
+      }
+
       const { error } = await supabase
         .from("feedback")
         .insert({
+          user_id: user.id,
           subject: subject.trim(),
           message: message.trim(),
         });
@@ -59,6 +78,7 @@ export const UserFeedbackModal = ({ open, onOpenChange }: UserFeedbackModalProps
               placeholder="Subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+              maxLength={200}
             />
           </div>
           
@@ -68,6 +88,7 @@ export const UserFeedbackModal = ({ open, onOpenChange }: UserFeedbackModalProps
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={6}
+              maxLength={2000}
             />
           </div>
         </div>

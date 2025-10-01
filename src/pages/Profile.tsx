@@ -5,11 +5,12 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Camera, Share, Save, X } from "lucide-react";
+import { Camera, Share, Save, X, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { UserFeedbackModal } from "@/components/UserFeedbackModal";
 
 const MAX_FILE_MB = 5;
 
@@ -26,6 +27,7 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [initialData, setInitialData] = useState({
     name: "",
     targetRole: "",
@@ -370,7 +372,22 @@ const Profile = () => {
           </div>
         </div>
         {/* END PAGE CONTAINER */}
+
+        {/* Feedback Button */}
+        <div className="mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setFeedbackOpen(true)}
+            className="w-full"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Send Feedback
+          </Button>
+        </div>
       </div>
+
+      {/* Feedback Modal */}
+      <UserFeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
 
       {/* BottomNavigation kept OUTSIDE the container */}
       <BottomNavigation onAddClick={handleAddClick} user={user} onSignOut={handleSignOut} />
