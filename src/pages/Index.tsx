@@ -99,7 +99,7 @@ const Index = () => {
         {/* Header */}
         <div className="px-4 pt-8 pb-4">
         <div className="flex items-center justify-between mb-10">
-          <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
+          <h1 className="text-2xl font-bold text-foreground mt-5">{format(currentDate, "MMM yyyy")}</h1>
         </div>
         
         <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
