@@ -293,7 +293,7 @@ const Vacation = () => {
               <>
                 <h2 className="text-xl font-semibold text-foreground mb-2">Set Vacation Duration</h2>
                 <p className="text-muted-foreground mb-6 text-sm">
-                  Your routines will be paused and grayed out during your vacation
+                  Your routines will be paused during your vacation
                 </p>
 
                 <div className="space-y-6">
