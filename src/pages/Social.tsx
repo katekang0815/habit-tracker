@@ -172,7 +172,7 @@ const Social = () => {
       <main className="container mx-auto py-8 max-w-xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Social</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2 mt-8">Social</h1>
           <p className="text-muted-foreground">Discover and connect with other habit builders</p>
         </div>
 
