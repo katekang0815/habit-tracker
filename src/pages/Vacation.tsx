@@ -135,7 +135,7 @@ const Vacation = () => {
   }, [vacationSchedules, scheduledVacation]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 relative overflow-hidden pt-6">
       {/* Beach Vacation Illustration */}
       <div className="absolute top-0 right-0 w-full h-80 overflow-hidden">
         <div className="relative w-full h-full">
