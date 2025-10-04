@@ -77,7 +77,7 @@ const Statistics = () => {
       <div className="container max-w-lg mx-auto px-4 py-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-6">Statistics</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-6 mt-8">Statistics</h1>
           
           <div className="flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
             <Button
