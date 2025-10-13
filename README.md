@@ -3,11 +3,17 @@
 ## Project info
 
 **URL**:https://habit-builder-24.lovable.app/
-<img width="960" height="580" alt="1" src="https://github.com/user-attachments/assets/df9582ab-a408-4f07-b7cb-3d6f7e01c6f8" />
-<img width="877" height="538" alt="2" src="https://github.com/user-attachments/assets/ca09f160-7bb3-4d5e-b9bb-8e0590464895" />
-<img width="876" height="530" alt="3" src="https://github.com/user-attachments/assets/a4641ddf-7491-4ecf-b14f-880c980b1d53" />
-<img width="878" height="536" alt="4" src="https://github.com/user-attachments/assets/27d16ce9-b1c6-407d-8900-10dfdfd034a1" />
-<img width="876" height="534" alt="5" src="https://github.com/user-attachments/assets/0702c06f-69c3-43a9-b5f2-550e46c2cf28" />
-<img width="879" height="529" alt="6" src="https://github.com/user-attachments/assets/a35e6fe3-6c12-4973-86a5-62cba9509be7" />
-<img width="877" height="532" alt="7" src="https://github.com/user-attachments/assets/28100337-f713-4b1f-999d-d31da449b5b6" />
-<img width="874" height="531" alt="8" src="https://github.com/user-attachments/assets/c4ee0abf-4da5-4d83-a80d-cce6d49f8d3c" />
+
+After going through a lengthy job-hunting process, I realized I couldn’t keep a routine alone. So I built habitConnect, a simple habit builder for job seekers. 
+What makes it different is the social layer. You can share your LinkedIn and Notion to collaborate, compare routines, and keep each other accountable. This was inspired by my experience in the Formation Fellowship since 2023. Pair sessions and peer support helped me more than grinding alone.
+
+Key Features: 
+
+🎯 Up to 8 habits to keep your week focused
+📈 Clean statistics so you can see momentum at a glance
+⏸️ A Break feature (because rest is part of the process)
+🤝 Opt-in Social: share your LinkedIn + Notion to find partners and compare routines
+🔒 Privacy by default: only sharers can access the social page
+🛡️ OAuth2 sign-in 
+
+My goal is to help people stay consistent, reduce the mental load, and build momentum together. If you’re job hunting, try it out. It’s free. I’d love your feedback.
