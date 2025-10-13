@@ -9,6 +9,8 @@ A Habit Builder + Networking app designed for job seekers to stay consistent and
 Live Demo: https://habit-builder-24.lovable.app/
 
 <img width="773" height="723" alt="Screenshot of habitConnect app" src="https://github.com/user-attachments/assets/cbd13616-0701-4b3d-85b1-0300806f83e1" />
+
+
 💡 Overview
 
 After going through a lengthy job-hunting process, I realized I couldn’t keep a routine alone.
