@@ -5,6 +5,7 @@
 **URL**:https://habit-builder-24.lovable.app/
 
 <img width="773" height="723" alt="Screenshot 2025-10-13 at 3 38 34 PM" src="https://github.com/user-attachments/assets/cbd13616-0701-4b3d-85b1-0300806f83e1" />
+<img width="961" height="827" alt="Screenshot 2025-10-13 at 3 40 01 PM" src="https://github.com/user-attachments/assets/20d44349-72f8-4296-81fc-dbd5832bfa8f" />
 
 After going through a lengthy job-hunting process, I realized I couldn’t keep a routine alone. So I built habitConnect, a simple habit builder for job seekers. 
 What makes it different is the social layer. You can share your LinkedIn and Notion to collaborate, compare routines, and keep each other accountable. This was inspired by my experience in the Formation Fellowship since 2023. Pair sessions and peer support helped me more than grinding alone.
