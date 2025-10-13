@@ -18,7 +18,7 @@ So I built habitConnect, a simple habit builder for job seekers.
 
 What makes it different is the social layer — you can share your LinkedIn and Notion profiles to collaborate, compare routines, and keep each other accountable.
 
-This idea was inspired by my experience in the Formation Fellowship (since 2023) — where pair sessions and peer support helped me far more than grinding alone.
+This idea was inspired by my experience in the Formation Fellowship (since 2023), where pair sessions and peer support helped me far more than grinding alone.
 
 ✨ Key Features
 
@@ -37,4 +37,4 @@ This idea was inspired by my experience in the Formation Fellowship (since 2023)
 🎯 Mission
 
 My goal is to help job seekers stay consistent, reduce mental load, and build momentum together.
-If you’re job hunting — give it a try, it’s free. I’d love your feedback!
+If you’re job hunting, give it a try, it’s free. I’d love your feedback!
