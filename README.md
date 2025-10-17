@@ -4,8 +4,6 @@
 
 **A Habit Builder + Networking app designed for job seekers to stay consistent and build routines together.**
 
-🔗 Project Info
-
 Live Demo: https://habit-builder-24.lovable.app/
 
 ## 🚀 Launch on Product Hunt
@@ -16,7 +14,7 @@ HabitConnect is now live on [Product Hunt!](https://www.producthunt.com/products
 
 
 ---
-
+🔗 Project Info
 
 ## 💡 Overview
 
