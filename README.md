@@ -8,9 +8,15 @@
 
 Live Demo: https://habit-builder-24.lovable.app/
 
+## 🚀 Launch on Product Hunt
+HabitConnect is now live on [Product Hunt!](https://www.producthunt.com/products/habitconnect)
+
+
 <img width="773" height="723" alt="Screenshot of habitConnect app" src="https://github.com/user-attachments/assets/cbd13616-0701-4b3d-85b1-0300806f83e1" />
 
+
 ---
+
 
 ## 💡 Overview
 
