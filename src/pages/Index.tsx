@@ -94,19 +94,22 @@ const Index = () => {
  
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
+    <div className="min-h-screen bg-[image:var(--gradient-background)]">
       <div className="max-w-xl mx-auto">
         {/* Header */}
         <div className="px-4 pt-8 pb-4">
-        <div className="flex items-center justify-between mb-10">
-          <h1 className="text-2xl font-bold text-foreground mt-8">{format(currentDate, "MMM yyyy")}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground">{format(currentDate, "MMM yyyy")}</h1>
         </div>
         
-        <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
+        {/* Frosted WeekView Container */}
+        <div className="rounded-2xl p-4 backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)]">
+          <WeekView currentDate={currentDate} onDateChange={debouncedDateChange} />
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 px-4 pb-24 mt-10">
+      <div className="flex-1 px-4 pb-24 mt-6">
         {loading ? (
           <div className="space-y-3">
             {[...Array(4)].map((_, index) => (
@@ -142,19 +145,21 @@ const Index = () => {
             )}
           </div>
         ) : (
-          <HabitList 
-            key={currentDate.toISOString()}
-            habits={habits.slice(0, 8)} 
-            onToggleHabit={toggleHabit}
-            onDeleteHabit={deleteHabit}
-            onPauseHabit={pauseHabit}
-            onActivateHabit={activateHabit}
-            onEditHabit={editHabit}
-            onReorderHabits={reorderHabits}
-            isVacationDate={isDateInVacation(currentDate)}
-            isHistoricalDate={!isPacificToday(currentDate)}
-            canReorder={isPacificToday(currentDate) && !isDateInVacation(currentDate)}
-          />
+          <div className="rounded-2xl p-4 backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)]">
+            <HabitList 
+              key={currentDate.toISOString()}
+              habits={habits.slice(0, 8)} 
+              onToggleHabit={toggleHabit}
+              onDeleteHabit={deleteHabit}
+              onPauseHabit={pauseHabit}
+              onActivateHabit={activateHabit}
+              onEditHabit={editHabit}
+              onReorderHabits={reorderHabits}
+              isVacationDate={isDateInVacation(currentDate)}
+              isHistoricalDate={!isPacificToday(currentDate)}
+              canReorder={isPacificToday(currentDate) && !isDateInVacation(currentDate)}
+            />
+          </div>
         )}
         </div>
 

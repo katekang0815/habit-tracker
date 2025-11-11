@@ -6,27 +6,27 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 160 15% 15%;
+    --background: 160 25% 20%;
+    --foreground: 140 10% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 160 15% 15%;
+    --card: 160 15% 25%;
+    --card-foreground: 140 10% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 15% 15%;
+    --popover: 160 15% 25%;
+    --popover-foreground: 140 10% 95%;
 
-    --primary: 140 60% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 142 60% 50%;
+    --primary-foreground: 140 10% 10%;
     --primary-glow: 140 65% 65%;
 
-    --secondary: 120 30% 95%;
-    --secondary-foreground: 160 15% 15%;
+    --secondary: 160 15% 30%;
+    --secondary-foreground: 140 10% 95%;
 
-    --muted: 120 40% 95%;
-    --muted-foreground: 160 10% 45%;
+    --muted: 160 15% 28%;
+    --muted-foreground: 140 10% 70%;
 
-    --accent: 140 40% 92%;
-    --accent-foreground: 160 20% 20%;
+    --accent: 160 20% 35%;
+    --accent-foreground: 140 10% 95%;
 
     --success: 140 70% 45%;
     --success-foreground: 0 0% 100%;
@@ -34,9 +34,9 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 120 15% 88%;
-    --input: 120 15% 94%;
-    --ring: 140 60% 50%;
+    --border: 160 15% 35%;
+    --input: 160 15% 28%;
+    --ring: 142 60% 50%;
 
     /* Habit tracking specific colors */
     --habit-complete: 140 70% 45%;
@@ -46,9 +46,14 @@
     --calendar-today: 160 20% 35%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(140 60% 50%), hsl(140 65% 65%));
-    --gradient-background: linear-gradient(180deg, hsl(120 30% 98%), hsl(140 20% 96%));
+    --gradient-primary: linear-gradient(135deg, hsl(142 60% 50%) 0%, hsl(142 60% 60%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(160 30% 18%) 0%, hsl(140 25% 22%) 50%, hsl(180 20% 20%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(120 20% 98%));
+    
+    /* Frosted Glass Effect */
+    --frost-bg: hsla(160, 20%, 25%, 0.4);
+    --frost-border: hsla(140, 15%, 45%, 0.2);
+    --frost-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -74,14 +79,14 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 160 25% 12%;
+    --foreground: 140 10% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 160 15% 18%;
+    --card-foreground: 140 10% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 160 15% 18%;
+    --popover-foreground: 140 10% 95%;
 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
@@ -89,8 +94,8 @@
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 160 15% 22%;
+    --muted-foreground: 140 10% 70%;
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
@@ -98,9 +103,14 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 160 15% 30%;
+    --input: 160 15% 22%;
+    --ring: 142 60% 50%;
+    
+    /* Frosted Glass Effect - Dark Mode */
+    --frost-bg: hsla(160, 20%, 18%, 0.5);
+    --frost-border: hsla(140, 15%, 45%, 0.25);
+    --frost-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
