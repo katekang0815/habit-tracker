@@ -33,7 +33,7 @@ export const UserProfileCard = ({ user, onClick }: UserProfileCardProps) => {
 
   return (
     <Card 
-      className="group cursor-pointer hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/20"
+      className="group cursor-pointer backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)] hover:shadow-lg hover:border-primary/30 transition-all duration-300"
       onClick={() => onClick?.(user.user_id)}
     >
       <CardContent className="p-6 text-center">
