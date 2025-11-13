@@ -220,7 +220,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 pb-20">
+    <div className="min-h-screen bg-[image:var(--gradient-background)] pb-20">
       <div className="container mx-auto px-4 py-8 max-w-md">
         {/* Header (kept OUTSIDE the new container) */}
         <h1 className="text-2xl font-semibold text-center mb-6 text-foreground">Profile</h1>

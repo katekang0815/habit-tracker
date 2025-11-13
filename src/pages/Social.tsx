@@ -168,7 +168,7 @@ const Social = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
+    <div className="min-h-screen bg-[image:var(--gradient-background)]">
       <main className="container mx-auto py-8 max-w-xl">
         {/* Header */}
         <div className="mb-8">
