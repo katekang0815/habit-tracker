@@ -79,7 +79,7 @@ const Statistics = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-6 mt-8">Statistics</h1>
           
-          <div className="flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+          <div className="flex items-center justify-between backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)] rounded-xl p-4">
             <Button
               variant="ghost"
               size="sm"
@@ -116,7 +116,7 @@ const Statistics = () => {
             </div>
           ) : (
             habitStats.map((stat, index) => (
-              <Card key={stat.habitId} className="p-3 bg-card/50 backdrop-blur-sm border-border/50">
+              <Card key={stat.habitId} className="p-3 backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)]">
                 <div className="flex items-start gap-2 mb-3">
                   {stat.emoji && (
                     <span className="text-lg">{stat.emoji}</span>
