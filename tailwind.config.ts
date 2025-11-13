@@ -124,13 +124,22 @@ export default {
 						transform: 'scale(1) rotate(180deg)',
 						opacity: '1'
 					}
+				},
+				'gradient-border': {
+					'0%, 100%': {
+						backgroundPosition: '0% 50%'
+					},
+					'50%': {
+						backgroundPosition: '100% 50%'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'spark': 'spark 0.6s ease-out',
-				'sparkle': 'sparkle 0.8s ease-in-out'
+				'sparkle': 'sparkle 0.8s ease-in-out',
+				'gradient-border': 'gradient-border 3s ease infinite'
 			}
 		}
 	},

@@ -108,11 +108,11 @@ const SortableHabitItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
+      className={`relative bg-card/80 backdrop-blur-sm rounded-xl p-4 shadow-sm transition-all duration-300 ${
         !habit.can_toggle ? 'opacity-90' : ''
       } ${isVacationDate ? 'opacity-40 grayscale' : ''} ${!habit.is_active ? 'opacity-40 grayscale' : ''} ${
         isDragging ? 'opacity-50 scale-105 z-50' : ''
-      }`}
+      } before:absolute before:inset-0 before:rounded-xl before:p-[2px] before:bg-gradient-to-r before:from-primary/0 before:via-primary/50 before:to-primary/0 before:bg-[length:200%_100%] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 hover:before:animate-gradient-border before:-z-10`}
     >
       <div className="flex items-center gap-4">
         {canReorder && (

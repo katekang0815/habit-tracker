@@ -116,7 +116,7 @@ const Statistics = () => {
             </div>
           ) : (
             habitStats.map((stat, index) => (
-              <Card key={stat.habitId} className="p-3 backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)]">
+              <Card key={stat.habitId} className="p-3 backdrop-blur-xl bg-[var(--frost-bg)] border border-[var(--frost-border)] shadow-[var(--frost-shadow)] relative before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-primary/0 before:via-primary/50 before:to-primary/0 before:bg-[length:200%_100%] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 hover:before:animate-gradient-border before:-z-10">
                 <div className="flex items-start gap-2 mb-3">
                   {stat.emoji && (
                     <span className="text-lg">{stat.emoji}</span>
